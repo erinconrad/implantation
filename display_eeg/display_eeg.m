@@ -17,6 +17,7 @@ locations = implant_files;
 data_folder = [locations.main_folder,'data/'];
 pwname = locations.pwfile;
 addpath(genpath(locations.script_folder));
+addpath(genpath(locations.ieeg_folder));
 
 %% Load pt file
 pt = load([data_folder,'pt.mat']);
