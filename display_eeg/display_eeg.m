@@ -1,5 +1,5 @@
 function display_eeg
-tic
+
 %% General parameters
 p = 2;
 f = 1;
@@ -33,7 +33,7 @@ while 1
     %% Download data
     data = get_eeg(pt(p).ieeg_names{f},pwname,[start_time start_time+display_time]);
     values = data.values;
-    chLabels = data.chLabels;
+    chLabels = data.chLabels(:,1);
     chIndices = 1:size(values,2);
     fs = data.fs;
     
@@ -54,7 +54,9 @@ while 1
     %% Spike detection
     all_spikes = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct);
     
-    toc
+    %% Re-derive original channels
+    out = rederive_original_chs(chIndices,all_spikes,chLabels,data.chLabels(:,1));
+    
     %% Plot data
     plot_signal(values,chLabels,display_time,all_spikes,fs,start_time)
     fprintf('\nPress any button to display next 15 seconds\n');

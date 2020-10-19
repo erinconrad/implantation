@@ -185,7 +185,10 @@ for dd = 1:n_chans
         
 end
 
-if isempty(all_spikes), return; end
+if isempty(all_spikes)
+    final_spikes = [];
+    return; 
+end
 
 
 % Remove any spikes that don't have co-occurrence across multiple channels
