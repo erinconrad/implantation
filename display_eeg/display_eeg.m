@@ -29,7 +29,7 @@ set(gcf,'position',[1 200 1400 800])
 
 
 while 1
-    
+    tic
     %% Download data
     data = get_eeg(pt(p).ieeg_names{f},pwname,[start_time start_time+display_time]);
     values = data.values;
@@ -56,9 +56,11 @@ while 1
     
     %% Re-derive original channels
     out = rederive_original_chs(chIndices,all_spikes,chLabels,data.chLabels(:,1));
+    toc
     
     %% Plot data
     plot_signal(values,chLabels,display_time,all_spikes,fs,start_time)
+    fprintf('\nSpeed of %1.1f\n',display_time/toc);
     fprintf('\nPress any button to display next 15 seconds\n');
     pause
     hold off
