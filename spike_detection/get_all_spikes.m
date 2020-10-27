@@ -69,6 +69,7 @@ while 1
     %% Check if it is all nans. If it is, move to the next file
     if sum(sum(~isnan(values))) == 0
         % breaking out of spike loop
+        fprintf('\nReached 60 s of all nans for %s file %d, moving to next file.\n',pt_name,f);
         break
     end
     
