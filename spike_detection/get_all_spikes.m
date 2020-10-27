@@ -101,6 +101,7 @@ while 1
     %% Move to next start time
     start_time = start_time+batch_time;
     
+    whos
 end
     
 
