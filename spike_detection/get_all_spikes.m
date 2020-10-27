@@ -32,6 +32,7 @@ for f = 1:length(pt(p).ieeg_names)
     
 pt_name = pt(p).name;
 fname = sprintf('%s_%d_spikes.mat',pt_name,f);
+fprintf('\nDoing %s file %d of %d\n',pt_name,f,length(pt(p).ieeg_names));
 
 %% Check for existing files
 clear spikes
