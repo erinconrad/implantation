@@ -1,8 +1,6 @@
 function get_all_spikes(overwrite)
 
 %% General parameters
-p = 1;
-f = 1;
 batch_time = 60;
 
 %% Spike detector parameters
@@ -28,6 +26,10 @@ if exist(out_folder,'dir') == 0
     mkdir(out_folder)
 end
 
+for p = 1:length(pt)
+
+for f = 1:length(pt(p).ieeg_names)
+    
 pt_name = pt(p).name;
 fname = sprintf('%s_%d_spikes.mat',pt_name,f);
 
@@ -63,6 +65,12 @@ while 1
     chLabels = data.chLabels(:,1);
     chIndices = 1:size(values,2);
     fs = data.fs;
+    
+    %% Check if it is all nans. If it is, move to the next file
+    if sum(sum(~isnan(values))) == 0
+        % breaking out of spike loop
+        break
+    end
     
     non_ekg_chs = get_non_ekg_chs(chLabels);
     values(:,~non_ekg_chs) = [];
@@ -102,6 +110,9 @@ while 1
     start_time = start_time+batch_time;
     
     whos
+end
+
+end
 end
     
 
