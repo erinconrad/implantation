@@ -5,7 +5,6 @@ function data = get_eeg(dataName,pwname,times)
 
 %% Unchanging parameters
 loginname = 'erinconr';
-n = 0;
 session = IEEGSession(dataName, loginname, pwname);
 fs = session.data.sampleRate;
 channelLabels = session.data.channelLabels;
