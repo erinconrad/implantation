@@ -122,6 +122,7 @@ for p = 1:length(pt)
             %% Add data to structure and save
             spikes.spikes(i).spikes = [spikes.spikes(i).spikes;out];
             spikes.spikes(i).start_time = start_time+batch_time;
+            spikes.time_index = i;
             spikes.fs = fs;
             spikes.chLabels = chLabels;
             save([out_folder,fname],'spikes');
