@@ -82,7 +82,7 @@ for p = 1:length(pt)
         while start_time < spikes.spikes(i).times(2)
             
             fprintf('\nDoing %1.1f of %1.1f s of %d of %d\n',start_time-spikes.spikes(i).times(1),...
-                spikes.spikes(i).times(2)-spikes.spikes(i).times(1),curr_index,n_times);
+                spikes.spikes(i).times(2)-spikes.spikes(i).times(1),i,n_times);
             
             %% Download data
             data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
