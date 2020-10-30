@@ -124,7 +124,7 @@ for p = 1:length(pt)
             spikes.spikes(i).start_time = start_time+batch_time;
             spikes.time_index = i;
             spikes.fs = fs;
-            spikes.chLabels = chLabels;
+            spikes.spikes(i).chLabels = chLabels;
             save([out_folder,fname],'spikes');
 
             %% Move to next start time

@@ -2,7 +2,7 @@ function sample_validation_spikes
 
 %% General parameters
 p = 1;
-f = 1;
+%f = 1;
 
 n_sp_plot = 50;
 n_per_fig = 10;
@@ -27,9 +27,9 @@ out_folder = [results_folder,'validation/',pt_name,'/'];
 if exist(out_folder,'dir') == 0, mkdir(out_folder); end
 
 %% Load spike file
-spikes = load([spike_folder,sprintf('%s_%d_spikes.mat',pt_name,f)]);
+spikes = load([spike_folder,sprintf('%s_spikes.mat',pt_name)]);
 spikes = spikes.spikes;
-nspikes = size(spikes.spikes,1);
+%nspikes = size(spikes.spikes,1);
 
 
 which_plot = 0;
@@ -44,10 +44,19 @@ for i = 1:n_sp_plot
         b = n_per_fig; 
     end
     
-    sp = randi(nspikes);
+    %% Randomly pick spike
+    while 1
+        ind = randi(length(spikes.spikes));
+        if ~isempty(spikes.spikes(ind).spikes)
+            break
+        end
+    end
+    sp = randi(size(spikes.spikes(ind).spikes,1));
+    %sp = randi(nspikes);
 
     %% Get info about the spike
-    curr_spike = spikes.spikes(sp,:);
+    curr_spike = spikes.spikes(ind).spikes(sp,:);
+    f = spikes.spikes(ind).times(3);
     sp_time = curr_spike(1);
     sp_ch = curr_spike(2);
 
