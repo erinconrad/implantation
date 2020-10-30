@@ -64,7 +64,22 @@ for w = 1:length(spikes.spikes)
     all_counts(:,w) = spikes.spikes(w).counts;
 end
 
+%% Reorder chs so that it's unchanged channels first, then old channels, then new channels
+% Also label them
+
 %% Raster plot
-imagesc(all_counts);
+imagesc(all_counts(all_elecs.change==0,:));
+yticks(1:length(all_counts(all_elecs.change==0,:)))
+yticklabels(all_elecs.master_labels(all_elecs.change==0))
+%{
+subplot(3,1,1)
+imagesc(all_counts(all_elecs.change==0,:));
+
+subplot(3,1,2)
+imagesc(all_counts(all_elecs.change==1,:));
+
+subplot(3,1,3)
+imagesc(all_counts(all_elecs.change==2,:));
+%}
 
 end
