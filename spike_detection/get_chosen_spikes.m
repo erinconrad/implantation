@@ -26,7 +26,7 @@ if exist(out_folder,'dir') == 0
     mkdir(out_folder)
 end
 
-for p = 1:length(pt)
+for p = 5:length(pt)
 
     pt_name = pt(p).name;
     fname = sprintf('%s_spikes.mat',pt_name);

@@ -1,7 +1,7 @@
 function spike_raster_plot
 
 %% Parameters
-p = 1;
+p = 3;
 
 %% Locations
 locations = implant_files;
@@ -64,14 +64,29 @@ for w = 1:length(spikes.spikes)
     all_counts(:,w) = spikes.spikes(w).counts;
 end
 
-%% Reorder chs so that it's unchanged channels first, then old channels, then new channels
-% Also label them
+%% Compare spike counts in first 5 blocks after each implantation
+pre = sum(all_counts(:,1:5),2);
+post = sum(all_counts(:,21:25),2);
+
+% Get relative change
+rel_change = (post-pre)./pre;
+
+% sort by relative change
+[sort_rel_change,I] = sort(rel_change);
 
 %% Raster plot
+figure
+set(gcf,'position',[399 1 560 800])
 imagesc(all_counts(all_elecs.change==0,:));
 yticks(1:length(all_counts(all_elecs.change==0,:)))
 yticklabels(all_elecs.master_labels(all_elecs.change==0))
+set(gca,'fontsize',10)
 %{
+figure
+imagesc(all_counts(all_elecs.change==1,:));
+yticks(1:length(all_counts(all_elecs.change==1,:)))
+yticklabels(all_elecs.master_labels(all_elecs.change==1))
+
 subplot(3,1,1)
 imagesc(all_counts(all_elecs.change==0,:));
 
