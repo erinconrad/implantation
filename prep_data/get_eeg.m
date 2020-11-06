@@ -10,7 +10,7 @@ fs = session.data.sampleRate;
 channelLabels = session.data.channelLabels;
 
 start_index = max(1,round(times(1)*fs));
-end_index = round(times(2)*fs); % no way to know size of values ahead of time so I can't account for asking for data beyond end of file
+end_index = round(times(2)*fs); 
 values = session.data.getvalues([start_index:end_index],':');
 
 data.values = values;

@@ -1,3 +1,7 @@
+%{
+I did not complete pt 4 or 6 due to server errors!!!
+%}
+
 function get_chosen_spikes(overwrite)
 
 %% General parameters
@@ -26,7 +30,7 @@ if exist(out_folder,'dir') == 0
     mkdir(out_folder)
 end
 
-for p = 5:length(pt)
+for p = 7:length(pt)
 
     pt_name = pt(p).name;
     fname = sprintf('%s_spikes.mat',pt_name);
@@ -51,11 +55,13 @@ for p = 5:length(pt)
             spikes.name = pt_name;
             spikes.times = all_times;
             spikes.time_index = 1;
+            spikes.server_error_times = [];
         end
     else
         spikes.name = pt_name;
         spikes.times = all_times;
         spikes.time_index = 1;
+        spikes.server_error_times = [];
     end
     
     if isfield(spikes,'spikes') == 0
@@ -85,8 +91,36 @@ for p = 5:length(pt)
                 spikes.spikes(i).times(2)-spikes.spikes(i).times(1),i,n_times);
             
             %% Download data
+            % Wrap it in a try catch loop to look for internal server
+            % errors and move to the next second
             data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
-                pwname,[start_time start_time+batch_time]);
+                    pwname,[start_time start_time+batch_time]);
+                %{
+            try
+                data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
+                    pwname,[start_time start_time+batch_time]);
+            catch ME
+                if contains(ME.message,'An error response with status 500 (Internal Server Error)')
+                    str=input('\nWacky server error, skipping this minute. Okay? (y/n)\n','s');
+                    if strcmp(str,'y')
+                        
+                        % Add info about this minute to the file
+                        spikes.server_error_times = [spikes.server_error_times;...
+                            spikes.spikes(i).times(3),start_time,start_time+batch_time]; % whichfile, which times
+
+
+                        % Move to next time
+                        start_time = start_time+batch_time;
+                        continue
+                    else
+                        error('Fix it');
+                    end
+                else
+                    ME.message
+                    error('Other error')
+                end
+            end
+                    %}
             values = data.values;
             chLabels = data.chLabels(:,1);
             chIndices = 1:size(values,2);
