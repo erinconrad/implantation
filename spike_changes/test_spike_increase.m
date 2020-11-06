@@ -21,7 +21,7 @@ goes along with closer electrodes having greater increase in spike rate.
 %}
 
 %% Parameters
-p = 1;
+p = 2;
 min_sp = 10;
 n_std = 2;
 nboot = 1e4;
@@ -110,6 +110,8 @@ ignore_elecs = few_spikes | changing_elecs;
 % Remove electrodes from both rel_change and dist
 rel_change(ignore_elecs) = [];
 dist(ignore_elecs) = [];
+new_labels = all_elecs.master_labels;
+new_labels(ignore_elecs) = [];
 
 if 1
 figure
@@ -133,8 +135,8 @@ dist_inc = mean(dist(elec_inc));
 % under the null distribution
 
 % One problem with this is that electrodes that are closer together are
-% likely to have a similar increase in spikes, even if this is not driven
-% by distance from new electrodes. Need to think about this.
+% more likely to have a similar increase in spikes, even if this is not 
+% driven by distance from new electrodes. Need to think about this.
 
 dist_boot = zeros(nboot,1);
 for ib = 1:nboot
@@ -162,7 +164,7 @@ if 1
     figure
     plot(dist_boot,'o')
     hold on
-    plot([dist_inc dist_inc],get(gca,'ylim'))
+    plot(get(gca,'xlim'),[dist_inc dist_inc])
     title(sprintf('Bootstrap p-value %1.3f',p_val))
 end
 

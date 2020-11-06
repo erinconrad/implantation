@@ -1,7 +1,7 @@
 function spike_raster_plot
 
 %% Parameters
-p = 3;
+p = 2;
 
 %% Locations
 locations = implant_files;
@@ -80,13 +80,16 @@ set(gcf,'position',[399 1 560 800])
 imagesc(all_counts(all_elecs.change==0,:));
 yticks(1:length(all_counts(all_elecs.change==0,:)))
 yticklabels(all_elecs.master_labels(all_elecs.change==0))
+title('Unchanged electrodes')
 set(gca,'fontsize',10)
-%{
+
 figure
 imagesc(all_counts(all_elecs.change==1,:));
 yticks(1:length(all_counts(all_elecs.change==1,:)))
 yticklabels(all_elecs.master_labels(all_elecs.change==1))
+title('New electrodes')
 
+%{
 subplot(3,1,1)
 imagesc(all_counts(all_elecs.change==0,:));
 
