@@ -1,5 +1,5 @@
 %{
-I did not complete pt 4 or 6 due to server errors!!!
+I did not complete pt 4, 6, or 7 due to server errors!!!
 %}
 
 function get_chosen_spikes(overwrite)
@@ -30,7 +30,7 @@ if exist(out_folder,'dir') == 0
     mkdir(out_folder)
 end
 
-for p = 7:length(pt)
+for p = 8:length(pt)
 
     pt_name = pt(p).name;
     fname = sprintf('%s_spikes.mat',pt_name);
