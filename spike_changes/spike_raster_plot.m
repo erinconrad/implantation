@@ -1,7 +1,7 @@
 function spike_raster_plot
 
 %% Parameters
-p = 2;
+p = 1;
 
 %% Locations
 locations = implant_files;

@@ -93,9 +93,11 @@ for p = 7:length(pt)
             %% Download data
             % Wrap it in a try catch loop to look for internal server
             % errors and move to the next second
+            %{
             data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
                     pwname,[start_time start_time+batch_time]);
-                %{
+            %}
+                
             try
                 data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
                     pwname,[start_time start_time+batch_time]);

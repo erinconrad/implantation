@@ -21,7 +21,7 @@ goes along with closer electrodes having greater increase in spike rate.
 %}
 
 %% Parameters
-p = 2;
+p = 1;
 min_sp = 10;
 n_std = 2;
 nboot = 1e4;
