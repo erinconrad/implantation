@@ -1,14 +1,15 @@
 function list_annotations
+pt_file = 'pt_w_elecs.mat';
 
 %% Locations
 locations = implant_files;
-data_folder = [locations.main_folder,'data/'];
+data_folder = [locations.main_folder,'data/data_files/'];
 pwname = locations.pwfile;
 addpath(genpath(locations.script_folder));
 addpath(genpath(locations.ieeg_folder));
 
 %% Load pt file
-pt = load([data_folder,'pt.mat']);
+pt = load([data_folder,pt_file]);
 pt = pt.pt;
 
 
