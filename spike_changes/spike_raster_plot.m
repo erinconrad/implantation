@@ -2,10 +2,11 @@ function spike_raster_plot
 
 %% Parameters
 p = 1;
+pt_file = 'pt_w_elecs.mat';
 
 %% Locations
 locations = implant_files;
-data_folder = [locations.main_folder,'data/'];
+data_folder = [locations.main_folder,'data/data_files/'];
 results_folder = [locations.main_folder,'results/'];
 spike_folder = [results_folder,'spikes/'];
 pwname = locations.pwfile;
@@ -13,7 +14,7 @@ addpath(genpath(locations.script_folder));
 addpath(genpath(locations.ieeg_folder));
 
 %% Load files
-pt = load([data_folder,'pt.mat']);
+pt = load([data_folder,pt_file]);
 pt = pt.pt;
 
 pt_name = pt(p).name;
@@ -64,15 +65,6 @@ for w = 1:length(spikes.spikes)
     all_counts(:,w) = spikes.spikes(w).counts;
 end
 
-%% Compare spike counts in first 5 blocks after each implantation
-pre = sum(all_counts(:,1:5),2);
-post = sum(all_counts(:,21:25),2);
-
-% Get relative change
-rel_change = (post-pre)./pre;
-
-% sort by relative change
-[sort_rel_change,I] = sort(rel_change);
 
 %% Raster plot
 figure

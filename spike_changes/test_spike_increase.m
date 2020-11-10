@@ -25,10 +25,11 @@ p = 1;
 min_sp = 10;
 n_std = 2;
 nboot = 1e4;
+pt_file = 'pt_w_elecs.mat';
 
 %% Locations
 locations = implant_files;
-data_folder = [locations.main_folder,'data/'];
+data_folder = [locations.main_folder,'data/data_files/'];
 results_folder = [locations.main_folder,'results/'];
 spike_folder = [results_folder,'spikes/'];
 pwname = locations.pwfile;
@@ -36,7 +37,7 @@ addpath(genpath(locations.script_folder));
 addpath(genpath(locations.ieeg_folder));
 
 %% Load files
-pt = load([data_folder,'elec_locs/pt_w_elecs.mat']);
+pt = load([data_folder,pt_file]);
 pt = pt.pt;
 
 pt_name = pt(p).name;
@@ -88,8 +89,8 @@ end
 
 %% Compare spike counts in first 5 blocks after each implantation
 %pre = sum(all_counts(:,1:5),2);
-pre = sum(all_counts(:,1:20),2);
-post = sum(all_counts(:,21:40),2);
+pre = sum(all_counts(:,1),2);
+post = sum(all_counts(:,3),2);
 
 
 %% Compute relative change
