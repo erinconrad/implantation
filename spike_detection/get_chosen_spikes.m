@@ -1,11 +1,12 @@
-%{
-I did not complete pt 4, 6, 7, or 8 due to server errors!!!
-%}
+
 
 function get_chosen_spikes(overwrite)
 
 %% General parameters
+whichPts = 1;
+add_clean_times = 1;
 batch_time = 60;
+pt_file = 'pt_w_elecs.mat';
 
 %% Spike detector parameters
 tmul = 15;
@@ -15,7 +16,7 @@ max_ch_pct = 80; % if spike > 80% of channels, throw away
 
 %% Locations
 locations = implant_files;
-data_folder = [locations.main_folder,'data/'];
+data_folder = [locations.main_folder,'data/data_files/'];
 results_folder = [locations.main_folder,'results/'];
 out_folder = [results_folder,'spikes/'];
 pwname = locations.pwfile;
@@ -23,17 +24,23 @@ addpath(genpath(locations.script_folder));
 addpath(genpath(locations.ieeg_folder));
 
 %% Load pt file
-pt = load([data_folder,'pt.mat']);
+pt = load([data_folder,pt_file]);
 pt = pt.pt;
 
 if exist(out_folder,'dir') == 0
     mkdir(out_folder)
 end
 
-for p = 9:length(pt)
+for p = whichPts
 
     pt_name = pt(p).name;
     fname = sprintf('%s_spikes.mat',pt_name);
+    
+    %% Add clean times to structure
+    if add_clean_times == 1
+        pt = add_clean_times_to_struct(pt);
+        % If not, doing the randomly chosen times already there
+    end
     
     %% Times to do
     pre_implant = pt(p).pre_times;

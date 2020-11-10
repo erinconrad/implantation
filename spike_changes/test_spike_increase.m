@@ -87,8 +87,9 @@ for w = 1:length(spikes.spikes)
 end
 
 %% Compare spike counts in first 5 blocks after each implantation
-pre = sum(all_counts(:,1:5),2);
-post = sum(all_counts(:,21:25),2);
+%pre = sum(all_counts(:,1:5),2);
+pre = sum(all_counts(:,1:20),2);
+post = sum(all_counts(:,21:40),2);
 
 
 %% Compute relative change
@@ -115,10 +116,11 @@ new_labels(ignore_elecs) = [];
 
 if 1
 figure
-scatter(rel_change,dist)
+scatter(rel_change,dist,'filled')
 title(sprintf('%s',pt_name))
 xlabel('Relative change in spike count')
 ylabel('Distance from closest new electrodes')
+set(gca,'fontsize',20);
 end
 
 %% Find those electrodes with a substantial increase in spike rate
@@ -165,7 +167,14 @@ if 1
     plot(dist_boot,'o')
     hold on
     plot(get(gca,'xlim'),[dist_inc dist_inc])
-    title(sprintf('Bootstrap p-value %1.3f',p_val))
+    if p_val < 0.001
+        title(sprintf('Permutation test p-value < 0.001'))
+    else
+        title(sprintf('Permutation test p-value %1.3f',p_val))
+    end
+    xlabel('Permutation')
+    ylabel(sprintf('Average distance from\nclosest new electrode'))
+    set(gca,'fontsize',20);
 end
 
 %% Get the Spearman rank correlation between the relative change and 1/dist vectors
