@@ -6,7 +6,7 @@ data_folder = [locations.main_folder,'data/'];
 clean_times_file = [data_folder,'reimplantation patients.xlsx'];
 
 %% Load the clean times files
-clean_times = readtable(clean_times_file);
+clean_times = readtable(clean_times_file,'ReadVariableNames',0);
 
 for p = 1:length(pt)
     
