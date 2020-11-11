@@ -1,12 +1,12 @@
-function test_spike_increase
-
+function test_spike_decrease
 %{
 This tests the hypothesis that implanting electrodes transiently increases
 spike rates in the region of the electrodes.
 
 The prediction is that the spike rates in the electrodes close to the newly
-implanted electrodes are disproportionately increased relative to other
-electrodes
+implanted electrodes will have a greater decrease over time after
+implantation than other electrodes (as these spikes are "implantation
+effect" spikes and so should be transient compared to other spikes).
 
 I will calculate the relative change in spike rates in electrodes. I will
 remove electrodes for which there are barely any spikes overall. 
@@ -16,16 +16,17 @@ I will then sort the electrodes by relative change.
 I will separately sort the electrodes by inverse distance from the newly implanted
 electrodes.
 
-I will calculate the Spearman rank coefficient. A higher coefficient
-goes along with closer electrodes having greater increase in spike rate.
 %}
 
 %% Parameters
-p = 4;
+p = 1;
 min_sp = 10;
 n_std = 2;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
+
+pre_time = 21:25;
+post_time = 36:40;
 
 %% Locations
 locations = implant_files;
@@ -87,10 +88,9 @@ for w = 1:length(spikes.spikes)
     all_counts(:,w) = spikes.spikes(w).counts;
 end
 
-%% Compare spike counts in first 5 blocks after each implantation
-%pre = sum(all_counts(:,1:5),2);
-pre = sum(all_counts(:,1:20),2);
-post = sum(all_counts(:,21:40),2);
+%% Compare spike counts at beginning and end of re-implantation period
+pre = sum(all_counts(:,pre_time),2);
+post = sum(all_counts(:,post_time),2);
 
 
 %% Compute relative change
