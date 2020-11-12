@@ -17,7 +17,7 @@ end_index = round(times(2)*fs);
 % Break the number of channels in half to avoid wacky server errors
 
 nchs = size(channelLabels,1);
-%error('look');
+error('look');
 values1 = session.data.getvalues([start_index:end_index],1:floor(nchs/2));
 values2 = session.data.getvalues([start_index:end_index],floor(nchs/2)+1:nchs);
 values = [values1,values2];
