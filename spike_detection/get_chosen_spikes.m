@@ -5,7 +5,7 @@ function get_chosen_spikes(overwrite)
 %4 6 7 8
 
 %% General parameters
-whichPts = [4,6,7,8];
+whichPts = [4 6 7 8];
 add_clean_times = 0;
 batch_time = 60;
 pt_file = 'pt_w_elecs.mat';
