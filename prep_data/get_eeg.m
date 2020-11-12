@@ -12,10 +12,10 @@ channelLabels = session.data.channelLabels;
 start_index = max(1,round(times(1)*fs));
 end_index = round(times(2)*fs); 
 
-values = session.data.getvalues([start_index:end_index],':');
+%values = session.data.getvalues([start_index:end_index],':');
 
 % Break the number of channels in half to avoid wacky server errors
-%{
+
 nchs = size(channelLabels,1);
 values1 = session.data.getvalues([start_index:end_index],1:floor(nchs/2));
 values2 = session.data.getvalues([start_index:end_index],floor(nchs/2)+1:nchs);

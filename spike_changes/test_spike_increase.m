@@ -1,4 +1,4 @@
-function test_spike_increase
+function test_spike_increase(p)
 
 %{
 This tests the hypothesis that implanting electrodes transiently increases
@@ -21,11 +21,11 @@ goes along with closer electrodes having greater increase in spike rate.
 %}
 
 %% Parameters
-p = 4;
 min_sp = 10;
 n_std = 2;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
+do_rel = 0;
 
 %% Locations
 locations = implant_files;
@@ -94,7 +94,11 @@ post = sum(all_counts(:,21:40),2);
 
 
 %% Compute relative change
-rel_change = (post-pre)./pre;
+if do_rel == 1
+    rel_change = (post-pre)./pre;
+else
+    rel_change = post;
+end
 
 %% Get distances from closest new electrodes
 dist = distance_from_closest_new_elecs(pt,p);
@@ -115,10 +119,18 @@ dist(ignore_elecs) = [];
 new_labels = all_elecs.master_labels;
 new_labels(ignore_elecs) = [];
 
+%% Get the Spearman rank correlation between the relative change and 1/dist vectors
+inv_dist = 1./dist;
+[rho,pval] = corr(rel_change,dist,'Type','Spearman');
 if 1
 figure
 scatter(rel_change,dist,'filled')
-title(sprintf('%s',pt_name))
+if pval<0.001
+    title(sprintf('%s\nSpearman rank correlation: rho = %1.1f, p < 0.001',pt_name,rho))
+else
+    title(sprintf('%s\nSpearman rank correlation: rho = %1.1f, p = %1.3f',pt_name,rho,pval))
+end
+
 xlabel('Relative change in spike count')
 ylabel('Distance from closest new electrodes')
 set(gca,'fontsize',20);
@@ -163,7 +175,7 @@ if p_val == 0
     p_val = 1/(nboot+1);
 end
 
-if 1
+if 0
     figure
     plot(dist_boot,'o')
     hold on
@@ -178,8 +190,6 @@ if 1
     set(gca,'fontsize',20);
 end
 
-%% Get the Spearman rank correlation between the relative change and 1/dist vectors
-%inv_dist = 1./dist;
-%[rho,pval] = corr(rel_change,dist,'Type','Spearman');
+
 
 end

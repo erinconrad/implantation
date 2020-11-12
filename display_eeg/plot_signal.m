@@ -26,7 +26,7 @@ for s = 1:size(spikes,1)
     ch = spikes(s,2);
     offset_sp = ch_offsets(ch);
     
-    value_sp = values(index,ch);
+    value_sp = values(round(index),ch);
     
     plot(time,value_sp - offset_sp,'o')
     title(sprintf('Start time %1.1f s',start_time));

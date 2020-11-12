@@ -1,7 +1,6 @@
-function spike_raster_plot
+function spike_raster_plot(p)
 
 %% Parameters
-p = 1;
 pt_file = 'pt_w_elecs.mat';
 
 %% Locations

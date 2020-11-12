@@ -74,7 +74,7 @@ for p = all_p
         plot(linspace(0,surround*2,size(values,1)),values(:,sp_ch),'linewidth',2);
         hold on
         plot(surround,values(round(sp_index),sp_ch),'o','markersize',10)
-        title(sprintf('Spike %d %1.1f s %s index %d',sp,sp_time,chLabels{sp_ch},ind),'fontsize',10)
+        title(sprintf('Spike %d %1.1f s %s index %d file %d',sp,sp_time,chLabels{sp_ch},ind,f),'fontsize',10)
         if b ~= n_per_fig
             xticklabels([])
         end
