@@ -14,7 +14,7 @@ results_folder = [locations.main_folder,'results/'];
 pwname = locations.pwfile;
 addpath(genpath(locations.script_folder));
 addpath(genpath(locations.ieeg_folder));
-spike_folder = [results_folder,'spikes/'];
+spike_folder = [results_folder,'old/old Nov 10/spikes Nov 10/'];
 
 
 %% Load pt file

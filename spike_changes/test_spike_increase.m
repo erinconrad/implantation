@@ -43,6 +43,11 @@ pt = pt.pt;
 
 pt_name = pt(p).name;
 
+if ~isfield(pt(p).master_elecs,'locs')
+    fprintf('\nNo electrode locations for %s, quitting.\n',pt_name);
+    return
+end
+
 spikes = load([spike_folder,sprintf('%s_spikes.mat',pt_name)]);
 spikes = spikes.spikes;
 
