@@ -23,13 +23,13 @@ min_distance = 3600; % this is how far away different chunks should be from each
 
 %% Locations
 locations = implant_files;
-data_folder = [locations.main_folder,'data/'];
+data_folder = [locations.main_folder,'data/data_files/'];
 pwname = locations.pwfile;
 addpath(genpath(locations.script_folder));
 addpath(genpath(locations.ieeg_folder));
 
 %% Load pt file
-pt = load([data_folder,'pt.mat']);
+pt = load([data_folder,'pt_w_elecs.mat']);
 pt = pt.pt;
 
 all_reimplant_times = [];
@@ -75,7 +75,25 @@ for p = 1:length(pt)
     end
     
     %% Exclude time surrounding seizures
-    % Need to code seizure times
+    sz_times = pt(p).sz_times;
+    new_sz_times = sz_times;
+    for t = 1:size(sz_times,1)
+        file_time = sz_times(t,1);
+        which_file = sz_times(t,2);
+        
+        % Convert to overall times
+        total_time = convert_file_time_to_total_time(pt,p,file_time,which_file);
+        new_sz_times(t,3) = total_time;
+    end
+    
+    pt(p).sz_times = new_sz_times;
+    
+    % Exclude these times and one hour surrounding
+    for i = 1:size(new_sz_times,1)
+        exclusion = [exclusion;...
+            new_sz_times(i,3) - min_distance;...
+            new_sz_times(i,3) + min_distance];
+    end
     
     %% Start building times
     for s = 1:2 % pre- vs post- reimplant
@@ -175,5 +193,5 @@ hold on
 histogram(all_noreimplant(:,2),20)
 title('Post reimplant')
 
-save([data_folder,'pt.mat'],'pt')
+save([data_folder,'pt_w_elecs.mat'],'pt')
 end

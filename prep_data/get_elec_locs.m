@@ -1,9 +1,11 @@
-function get_elec_locs
+function pt = get_elec_locs
+
+overwrite = 0;
 
 %% Locations
 locations = implant_files;
-data_folder = [locations.main_folder,'data/'];
-elec_folder = [data_folder,'elec_locs/'];
+data_folder = [locations.main_folder,'data/data_files/'];
+elec_folder = [locations.main_folder,'data/elec_locs/'];
 results_folder = [locations.main_folder,'results/'];
 out_folder = [results_folder,'spikes/'];
 pwname = locations.pwfile;
@@ -11,7 +13,7 @@ addpath(genpath(locations.script_folder));
 addpath(genpath(locations.ieeg_folder));
 
 %% Load pt file
-pt = load([data_folder,'pt.mat']);
+pt = load([data_folder,'pt_w_elecs.mat']);
 pt = pt.pt;
 
 np = length(pt);
@@ -22,6 +24,11 @@ listing = dir(elec_folder);
 for p = 1:np
     clear locs
     
+    % Skip if we've already done it
+    if overwrite == 0
+        if isfield(pt(p).master_elecs,'locs'), continue; end
+    end
+    
     % Check if there is master electrode info
     if ~isstruct(pt(p).master_elecs), continue; end
     elec_labels_ordered = pt(p).master_elecs.master_labels;
@@ -30,14 +37,26 @@ for p = 1:np
     fprintf('\n\n\nDoing %s\n',name);
       
     % Check for file
-    if exist([elec_folder,name,'/electrodenames_coordinates_native_and_T1.csv'],'file') == 0
-        fprintf('\nCannot find electrode labels for %s, skipping...\n',name);
-        continue
+    fname{1} = '/electrodenames_coordinates_native_and_T1.csv';
+    fname{2} = '/SEEG_electrodenames_coordinates_native_and_T1.csv';
+    
+    found_it = 0;
+    for f = 1:length(fname)
+        if exist([elec_folder,name,fname{f}],'file') ~= 0
+            T = readtable([elec_folder,name,fname{f}]);
+            found_it = 1;
+            break
+        end
     end
     
-    % LOad the file with native coordinates and anatomic locations
-    T = readtable([elec_folder,name,'/electrodenames_coordinates_native_and_T1.csv']);
+    if found_it == 0
+        fprintf('\nCannot find electrode labels for %s, skipping...\n',name);
         
+        continue;
+    end
+        
+   
+    
     % Loop through the table, find the corresponding electrode in the
     % master electrode substructure, and that will determine the electrode index.
     
@@ -119,6 +138,8 @@ for p = 1:np
     missing_elecs.only_elec_file = A;
     missing_elecs.only_ieeg = B;
     pt(p).master_elecs.missing_elecs = missing_elecs;
+    
+   % if strcmp(name,'HUP128'), error('what'); end
 end
 
 

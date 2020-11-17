@@ -26,6 +26,7 @@ n_std = 2;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
 do_rel = 0;
+do_boot = 0;
 
 %% Locations
 locations = implant_files;
@@ -136,6 +137,14 @@ ylabel('Distance from closest new electrodes')
 set(gca,'fontsize',20);
 end
 
+%% List the top 10 spike rate increase electrodes
+if 0
+[~,big_inc] = sort(rel_change,'descend');
+new_labels(big_inc(1:10))
+end
+
+if do_boot
+
 %% Find those electrodes with a substantial increase in spike rate
 min_rel_change = mean(rel_change) + n_std*std(rel_change);
 elec_inc = find(rel_change > min_rel_change);
@@ -175,7 +184,7 @@ if p_val == 0
     p_val = 1/(nboot+1);
 end
 
-if 0
+if 1
     figure
     plot(dist_boot,'o')
     hold on
@@ -190,6 +199,6 @@ if 0
     set(gca,'fontsize',20);
 end
 
-
+end
 
 end

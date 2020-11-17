@@ -1,4 +1,4 @@
-function test_spike_decrease
+function test_spike_decrease(p)
 %{
 This tests the hypothesis that implanting electrodes transiently increases
 spike rates in the region of the electrodes.
@@ -19,7 +19,6 @@ electrodes.
 %}
 
 %% Parameters
-p = 1;
 min_sp = 10;
 n_std = 2;
 nboot = 1e4;
