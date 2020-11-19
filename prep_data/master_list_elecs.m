@@ -19,6 +19,7 @@ end
 %% Get list of unique labels from all the labels for that patient
 master_labels = unique(master_labels);
 
+
 %% Go through each file and get the index for each label in the master list
 for f = 1:nfiles
     curr_labels = all_labels{f};
@@ -60,6 +61,10 @@ out.change(new) = 1;
 out.change(old) = 2;
 
 
+%% Denote ekg
+non_ekg_chs = get_non_ekg_chs(pt(p).master_elecs.master_labels);
+ekg_chs = logical(~non_ekg_chs);
+out.ekg_chs = ekg_chs;
 
 
 end

@@ -114,14 +114,17 @@ end
 dist = distance_from_closest_new_elecs(pt,p);
 
 %% Get channels to ignore
+% Ignore EKG channels
+non_ekg_chs = get_non_ekg_chs(pt(p).master_elecs.master_labels);
+ekg_chs = logical(~non_ekg_chs);
+
 % Ignore channels for which number of spikes is less than minimum
 few_spikes = logical(pre+post < min_sp);
 
 % Ignore channels that are not always there
 changing_elecs = logical(all_elecs.change ~= 0);
-
 % Combine things I'm ignoring
-ignore_elecs = few_spikes | changing_elecs;
+ignore_elecs = few_spikes | changing_elecs | ekg_chs;
 
 % Remove electrodes from both rel_change and dist
 rel_change(ignore_elecs) = [];

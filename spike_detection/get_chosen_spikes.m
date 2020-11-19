@@ -2,7 +2,7 @@
 
 function get_chosen_spikes(overwrite,whichPts)
 
-%4 6 7 8
+%running through 9
 
 %% General parameters
 %whichPts = [1 3 5 6 8 9 10 11]; % I believe these are the pts with all available data

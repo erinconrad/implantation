@@ -11,6 +11,7 @@ for i = 1:length(pt(p).master_elecs.locs)
     loc_arr(i,:) = temp_loc;
 end
 
+
 %% Get locs of new elecs
 new_elecs = pt(p).master_elecs.change == 1;
 new_locs = loc_arr(new_elecs,:);

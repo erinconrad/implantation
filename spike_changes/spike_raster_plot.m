@@ -22,8 +22,9 @@ spikes = load([spike_folder,sprintf('%s_spikes.mat',pt_name)]);
 spikes = spikes.spikes;
 
 %% Make master list of electrodes
-all_elecs = master_list_elecs(pt,p);
-
+%all_elecs = master_list_elecs(pt,p);
+all_elecs = pt(p).master_elecs;
+ekg = all_elecs.ekg_chs;
 
 %% Go through all spikes and convert chs to the master indices
 for w = 1:length(spikes.spikes)
@@ -68,16 +69,16 @@ end
 %% Raster plot
 figure
 set(gcf,'position',[399 1 560 800])
-imagesc(all_counts(all_elecs.change==0,:));
-yticks(1:length(all_counts(all_elecs.change==0,:)))
-yticklabels(all_elecs.master_labels(all_elecs.change==0))
+imagesc(all_counts(all_elecs.change==0 & ekg == 0,:));
+yticks(1:length(all_counts(all_elecs.change==0& ekg == 0,:)))
+yticklabels(all_elecs.master_labels(all_elecs.change==0& ekg == 0))
 title('Unchanged electrodes')
 set(gca,'fontsize',10)
 
 figure
-imagesc(all_counts(all_elecs.change==1,:));
-yticks(1:length(all_counts(all_elecs.change==1,:)))
-yticklabels(all_elecs.master_labels(all_elecs.change==1))
+imagesc(all_counts(all_elecs.change==1 & ekg == 0,:));
+yticks(1:length(all_counts(all_elecs.change==1 & ekg == 0,:)))
+yticklabels(all_elecs.master_labels(all_elecs.change==1 & ekg == 0))
 title('New electrodes')
 
 %{
