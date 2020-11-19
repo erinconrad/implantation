@@ -24,8 +24,8 @@ n_std = 2;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
 
-pre_time = 21:25;
-post_time = 36:40;
+pre_time = 51:60;
+post_time = 91:100;
 
 %% Locations
 locations = implant_files;
@@ -130,6 +130,7 @@ elec_inc = find(rel_change > min_rel_change);
 %% Get mean distance from these electrodes to new electrodes
 dist_inc = mean(dist(elec_inc));
 
+if 0
 %% Do a permutation test to get statistics
 % I will randomly choose the same number of electrodes to be my
 % "substantial increase electrodes" and calculate their mean distance and
@@ -180,5 +181,5 @@ end
 %% Get the Spearman rank correlation between the relative change and 1/dist vectors
 %inv_dist = 1./dist;
 %[rho,pval] = corr(rel_change,dist,'Type','Spearman');
-
+end
 end

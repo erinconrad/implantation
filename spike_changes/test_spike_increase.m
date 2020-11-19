@@ -25,8 +25,8 @@ min_sp = 10;
 n_std = 2;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
-do_rel = 0;
-do_boot = 0;
+do_rel = 1;
+do_boot = 1;
 
 %% Locations
 locations = implant_files;
@@ -95,8 +95,12 @@ end
 
 %% Compare spike counts in first 5 blocks after each implantation
 %pre = sum(all_counts(:,1:5),2);
-pre = sum(all_counts(:,1:20),2);
-post = sum(all_counts(:,21:40),2);
+% Num pre implant and postimplant
+
+num_pre = size(pt(p).pre_times,1);
+pre = sum(all_counts(:,1:num_pre),2);
+post = sum(all_counts(:,num_pre+1:end),2);
+
 
 
 %% Compute relative change

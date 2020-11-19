@@ -19,7 +19,7 @@ for d = 1:nchs
     hp_power = sum(hp.^2);
     power_ratio = hp_power/all_power;
     
-    if power_ratio > 0.3
+    if power_ratio > 0.4
         bad(d) = 1;
     end
     

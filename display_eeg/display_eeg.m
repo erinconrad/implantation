@@ -1,11 +1,11 @@
 function display_eeg
 
 %% General parameters
-p = 4;
-f = 1;
-start_time = 76370;
-display_time = 600;
-do_analysis = 0;
+p = 3;
+f = [];
+start_time = [];
+display_time = 15;
+do_analysis = 1;
 
 %% Spike detector parameters
 tmul = 15;
@@ -23,6 +23,16 @@ addpath(genpath(locations.ieeg_folder));
 %% Load pt file
 pt = load([data_folder,'pt_w_elecs.mat']);
 pt = pt.pt;
+
+%% Pick random times if not specified
+if isempty(f)
+    % Pick a random pre-reimplantation index
+    i = randi(size(pt(p).pre_times,1));
+    %i = 34;
+    
+    f = pt(p).pre_times(i,2);
+    start_time = pt(p).pre_times(i,3);
+end
 
 %% Initialize figure
 figure
@@ -46,12 +56,16 @@ while 1
 
         %% Filters
         values = do_filters(values,fs);
+        orig_values = values;
+        orig_labels = chLabels;
 
         %% Remove artifact heavy channels
+        
         bad = rm_bad_chs(values);
         values(:,bad) = [];
         chLabels(bad) = [];
         chIndices(bad) = [];
+        %}
 
         %% Spike detection
         all_spikes = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct);
@@ -59,14 +73,18 @@ while 1
         %% Re-derive original channels
         if ~isempty(all_spikes)
             out = rederive_original_chs(chIndices,all_spikes,chLabels,data.chLabels(:,1));
+        else
+            out = [];
         end
         toc
     else
         all_spikes = [];
+        out = [];
     end
     
     %% Plot data
-    plot_signal(values,chLabels,display_time,all_spikes,fs,start_time)
+    %plot_signal(values,chLabels,display_time,all_spikes,fs,start_time)
+    plot_signal(orig_values,orig_labels,display_time,out,fs,start_time,bad)
     fprintf('\nSpeed of %1.1f\n',display_time/toc);
     fprintf('\nPress any button to display next time\n');
     pause
