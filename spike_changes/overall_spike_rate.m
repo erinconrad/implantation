@@ -1,7 +1,7 @@
 function total_count = overall_spike_rate(p)
 
 %% Parameters
-do_plot = 1;
+do_plot = 0;
 
 %% Locations
 locations = implant_files;

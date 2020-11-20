@@ -111,7 +111,7 @@ else
 end
 
 %% Get distances from closest new electrodes
-dist = distance_from_closest_new_elecs(pt,p);
+[dist,closest_elecs] = distance_from_closest_new_elecs(pt,p);
 
 %% Get channels to ignore
 % Ignore EKG channels
@@ -131,6 +131,7 @@ rel_change(ignore_elecs) = [];
 dist(ignore_elecs) = [];
 new_labels = all_elecs.master_labels;
 new_labels(ignore_elecs) = [];
+closest_elecs(ignore_elecs) = [];
 
 %% Get the Spearman rank correlation between the relative change and 1/dist vectors
 inv_dist = 1./dist;
@@ -150,9 +151,20 @@ set(gca,'fontsize',20);
 end
 
 %% List the top 10 spike rate increase electrodes
-if 0
+if 1
 [~,big_inc] = sort(rel_change,'descend');
-new_labels(big_inc(1:10))
+for i = 1:10
+    
+    fprintf('\nHigh spike rate increase electrode: %s\n',new_labels{big_inc(i)});
+   
+    % Get its nearest electrode
+    close = closest_elecs(big_inc(i));
+    fprintf('Its closest new electrode is %s,',all_elecs.master_labels{close});
+    
+    % Distance between the two
+    fprintf('which is %1.1f away.\n',dist(big_inc(i)));
+    
+end
 end
 
 if do_boot

@@ -1,10 +1,10 @@
 function all_pts_overall_spikes
 
 %% Parameters
-pre_implant_idx = 20;
-post_implant_idx = 21;
+pre_implant_idx = 50;
+post_implant_idx = 51;
 main_color = [0 0.4470 0.7410];
-do_shade = 0;
+do_shade = 1;
 
 %% Locations
 locations = implant_files;
@@ -75,7 +75,7 @@ else
     
 end
 hold on
-rp = plot([20.5 20.5],get(gca,'ylim'),'linewidth',2);
+rp = plot([50.5 50.5],get(gca,'ylim'),'linewidth',2);
 legend(rp,'Re-implantation','fontsize',20)
 ylabel('Spike counts')
 xlabel('Time since original implantation')

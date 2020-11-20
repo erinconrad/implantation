@@ -1,6 +1,6 @@
 function pt = get_elec_locs
 
-overwrite = 0;
+overwrite = 1;
 
 %% Locations
 locations = implant_files;
@@ -148,11 +148,12 @@ end
 function locs = add_loc_data(row,curr_label)
     locs.csv_file_name = row.Var1{1}; % electrode name per csv file
     locs.ieeg_name = curr_label; % ieeg electrode name
-    if iscell(class(row.Var2))
+    if iscell((row.Var2))
         locs.anatomic = row.Var2{1}; % anatomic location
     else
         locs.anatomic = nan;
     end
     locs.system(1).locs = [row.Var3,row.Var4,row.Var5]; % some coordinate system
     locs.system(2).locs = [row.Var11,row.Var12,row.Var13]; % some other coordinate system
+    
 end
