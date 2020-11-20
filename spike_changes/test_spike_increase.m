@@ -52,7 +52,8 @@ spikes = load([spike_folder,sprintf('%s_spikes.mat',pt_name)]);
 spikes = spikes.spikes;
 
 %% Make master list of electrodes
-all_elecs = master_list_elecs(pt,p);
+%all_elecs = master_list_elecs(pt,p);
+all_elecs = pt(p).master_elecs;
 
 %% Go through all spikes and convert chs to the master indices
 for w = 1:length(spikes.spikes)
@@ -111,7 +112,7 @@ else
 end
 
 %% Get distances from closest new electrodes
-[dist,closest_elecs] = distance_from_closest_new_elecs(pt,p);
+[dist,closest_elecs,new_locs,new_elecs] = distance_from_closest_new_elecs(pt,p);
 
 %% Get channels to ignore
 % Ignore EKG channels
@@ -133,12 +134,21 @@ new_labels = all_elecs.master_labels;
 new_labels(ignore_elecs) = [];
 closest_elecs(ignore_elecs) = [];
 
+%% Find those electrodes with a substantial increase in spike rate
+min_rel_change = mean(rel_change) + n_std*std(rel_change);
+elec_inc = find(rel_change > min_rel_change);
+
 %% Get the Spearman rank correlation between the relative change and 1/dist vectors
 inv_dist = 1./dist;
 [rho,pval] = corr(rel_change,dist,'Type','Spearman');
 if 1
 figure
 scatter(rel_change,dist,'filled')
+for i = 1:length(new_labels)
+    if 1%rel_change(i) > min_rel_change
+        text(rel_change(i),dist(i),new_labels{i},'fontsize',15)
+    end
+end
 if pval<0.001
     title(sprintf('%s\nSpearman rank correlation: rho = %1.1f, p < 0.001',pt_name,rho))
 else
@@ -150,10 +160,10 @@ ylabel('Distance from closest new electrodes')
 set(gca,'fontsize',20);
 end
 
-%% List the top 10 spike rate increase electrodes
+%% List the top 5 spike rate increase electrodes
 if 1
 [~,big_inc] = sort(rel_change,'descend');
-for i = 1:10
+for i = 1:5
     
     fprintf('\nHigh spike rate increase electrode: %s\n',new_labels{big_inc(i)});
    
@@ -164,14 +174,39 @@ for i = 1:10
     % Distance between the two
     fprintf('which is %1.1f away.\n',dist(big_inc(i)));
     
+    % Sanity check 1 (checking that distance is what I think it is)
+    alt_dist = distance_two_elecs(pt,p,new_labels{big_inc(i)},all_elecs.master_labels{close});
+    if alt_dist ~= dist(big_inc(i))
+        error('what');
+    end
+    
+    % Sanity check 2 (confirming that the closest electrode is the one I
+    % found)
+    curr_ind = find(strcmp(all_elecs.master_labels,new_labels{big_inc(i)}));
+    curr_loc = all_elecs.locs(curr_ind).system(1).locs;
+    min_dist = inf;
+    closest_check = nan;
+    for n = 1:size(new_locs,1)
+        if vecnorm(curr_loc-new_locs(n,:)) < min_dist
+            min_dist = vecnorm(curr_loc-new_locs(n,:));
+            closest_check = n;
+        end
+    end
+    closest_elec_check = new_elecs(closest_check);
+    closest_label = all_elecs.master_labels(closest_elec_check);
+    if min_dist ~= alt_dist
+        error('what');
+    end
+
+    if ~strcmp(closest_label,all_elecs.master_labels{close})
+        error('what');
+    end
 end
 end
 
 if do_boot
 
-%% Find those electrodes with a substantial increase in spike rate
-min_rel_change = mean(rel_change) + n_std*std(rel_change);
-elec_inc = find(rel_change > min_rel_change);
+
 
 %% Get mean distance from these electrodes to new electrodes
 dist_inc = mean(dist(elec_inc));

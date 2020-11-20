@@ -1,4 +1,4 @@
-function [dist,closest_elecs] = distance_from_closest_new_elecs(pt,p)
+function [dist,closest_elecs,new_locs,new_elecs_indices] = distance_from_closest_new_elecs(pt,p)
 
 %% Get locs in one friendly array
 loc_arr = zeros(length(pt(p).master_elecs.locs),3);

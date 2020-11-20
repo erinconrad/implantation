@@ -1,4 +1,4 @@
-function pt = get_elec_locs
+function pt = get_elec_locs(allp)
 
 overwrite = 1;
 
@@ -17,16 +17,26 @@ pt = load([data_folder,'pt_w_elecs.mat']);
 pt = pt.pt;
 
 np = length(pt);
+if isempty(allp)
+    allp = 1:np;
+end
 
 %% Get electrode folder listings
 listing = dir(elec_folder);
 
-for p = 1:np
+for p = allp
     clear locs
     
     % Skip if we've already done it
     if overwrite == 0
         if isfield(pt(p).master_elecs,'locs'), continue; end
+    end
+    
+    % Do something different from HUP 152
+    if p == 10
+       locs = do_pt_10(pt,p,elec_folder);
+       pt(p).master_elecs.locs = locs;
+       continue;
     end
     
     % Check if there is master electrode info
@@ -89,8 +99,9 @@ for p = 1:np
             letters = row_label(1:num_ind-1);
             if num < 10
                 new_label = [letters,'0',row_label(num_ind:end)];
+                names_to_try{3} = new_label;
             end
-            names_to_try{3} = new_label;
+            
                 
             
             for m = 1:length(elec_labels_ordered)
@@ -155,5 +166,68 @@ function locs = add_loc_data(row,curr_label)
     end
     locs.system(1).locs = [row.Var3,row.Var4,row.Var5]; % some coordinate system
     locs.system(2).locs = [row.Var11,row.Var12,row.Var13]; % some other coordinate system
+    
+end
+
+function locs = do_pt_10(pt,p,elec_folder)
+    elec_labels_ordered = pt(p).master_elecs.master_labels;
+    name = pt(p).name;
+    elec_file = [elec_folder,'HUP152/HUP152_electrodenames_coordinates_mni.csv'];
+    T = readtable(elec_file);
+    for t = 1:size(T,1)
+        row = T(t,:);
+        found_it = 0;
+        row_label = row.Var1{1};
+        
+        for m = 1:length(elec_labels_ordered)
+            curr_label = elec_labels_ordered{m};
+            if ~strcmp(row_label,curr_label), continue; end
+            
+            found_it = 1;
+            
+            locs(m) = add_loc_data_pt10(row,curr_label);
+
+        end
+        
+        if found_it == 0
+            if strcmp(row_label(2),'2')
+                temp_row_label = row_label([1,3:end]);
+                
+                for m = 1:length(elec_labels_ordered)
+                    curr_label = elec_labels_ordered{m};
+                    if strcmp(temp_row_label,curr_label)
+
+                        fprintf('\nWarning, found approximate match between %s and %s for %s\n',...
+                            row_label,curr_label,name);
+
+                        found_it = 1;
+                        locs(m) = add_loc_data_pt10(row,curr_label);
+                        break % don't try the other ones
+
+                    end
+                end
+                
+            end
+        end
+        
+        if found_it == 0
+            fprintf('\nDid not find corresponding electrode for %s %s\n',name,row_label); 
+            str = input('\nContinue? (y or n)\n','s');
+            if strcmp(str,'y') || strcmp(str,'Y')
+                continue;
+            else
+                error('Fix it!');
+            end
+        end
+        
+    end
+end
+
+function locs = add_loc_data_pt10(row,curr_label)
+    locs.csv_file_name = row.Var1{1}; % electrode name per csv file
+    locs.ieeg_name = curr_label; % ieeg electrode name
+    locs.anatomic = nan;
+    locs.system(1).locs = [row.Var2,row.Var3,row.Var4]; % some coordinate system
+    locs.system(2).locs = [nan,nan,nan]; % some other coordinate system
     
 end
