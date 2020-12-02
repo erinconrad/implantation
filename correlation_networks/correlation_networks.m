@@ -81,7 +81,7 @@ for p = whichPts
                 pt_name,r,nets_per_period,i,n_times);
         
             %% Get a random second within the 30 minute block
-            s = randi([all_times(i,3) all_times(i,3)+all_times(i,4)]);
+            s = randi([round(all_times(i,3)) round(all_times(i,3)+all_times(i,4))]);
             
             %% Download data
             data = get_eeg(pt(p).ieeg_names{networks.networks(i).times(3)},...
