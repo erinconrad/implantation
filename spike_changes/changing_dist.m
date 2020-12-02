@@ -1,6 +1,5 @@
-function spike_raster_plot(p)
+function changing_dist(p)
 
-%% Parameters
 pt_file = 'pt_w_elecs.mat';
 
 %% Locations
@@ -18,13 +17,17 @@ pt = pt.pt;
 
 pt_name = pt(p).name;
 
+if ~isfield(pt(p).master_elecs,'locs')
+    fprintf('\nNo electrode locations for %s, quitting.\n',pt_name);
+    return
+end
+
 spikes = load([spike_folder,sprintf('%s_spikes.mat',pt_name)]);
 spikes = spikes.spikes;
 
 %% Make master list of electrodes
 %all_elecs = master_list_elecs(pt,p);
 all_elecs = pt(p).master_elecs;
-ekg = all_elecs.ekg_chs;
 
 %% Go through all spikes and convert chs to the master indices
 for w = 1:length(spikes.spikes)
@@ -65,41 +68,16 @@ for w = 1:length(spikes.spikes)
     all_counts(:,w) = spikes.spikes(w).counts;
 end
 
+%% Get distances from closest new electrodes
+[dist,closest_elecs,new_locs,new_elecs] = distance_from_closest_new_elecs(pt,p);
 
-%% Raster plot
-figure
-set(gcf,'position',[399 1 560 800])
-imagesc(all_counts(all_elecs.change==0 & ekg == 0,:));
-hold on
-yticks(1:length(all_counts(all_elecs.change==0& ekg == 0,:)))
-yticklabels(all_elecs.master_labels(all_elecs.change==0& ekg == 0))
-set(gca,'fontsize',10)
-xlabel('Time period','fontsize',20)
-ylabel('Electrode','fontsize',20)
-title('Spike rate by electrode','fontsize',20)
+%% Convert all_counts to average distance of spikes from new electrodes over time
+avg_dist = all_counts.*dist;
+avg_dist = nansum(avg_dist,1);
 
-rp = plot([size(all_counts,2)/2 size(all_counts,2)/2],get(gca,'ylim'),'r','linewidth',2);
-%legend(rp,'Re-implantation','fontsize',25,'location','northeastoutside')
+plot(avg_dist)
 
-print(gcf,[results_folder,'raster_plots/',sprintf('%s',pt_name)],'-dpng')
-
-figure
-imagesc(all_counts(all_elecs.change==1 & ekg == 0,:));
-yticks(1:length(all_counts(all_elecs.change==1 & ekg == 0,:)))
-yticklabels(all_elecs.master_labels(all_elecs.change==1 & ekg == 0))
-title('New electrodes')
-
-
-
-%{
-subplot(3,1,1)
-imagesc(all_counts(all_elecs.change==0,:));
-
-subplot(3,1,2)
-imagesc(all_counts(all_elecs.change==1,:));
-
-subplot(3,1,3)
-imagesc(all_counts(all_elecs.change==2,:));
-%}
+%% Compare average distance of spikes to new electrodes
+[~,p] = ttest2(avg_dist(1:50),avg_dist(51:100))
 
 end

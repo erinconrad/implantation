@@ -1,4 +1,4 @@
-function test_spike_increase(p)
+function [pvaltt,tstat] = test_spike_increase(p)
 
 %{
 This tests the hypothesis that implanting electrodes transiently increases
@@ -21,12 +21,16 @@ goes along with closer electrodes having greater increase in spike rate.
 %}
 
 %% Parameters
+do_plot = 1;
 min_sp = 10;
 n_std = 2;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
 do_rel = 1;
 do_boot = 1;
+perc_closest_elecs = 0.05;
+early_post_implant = 51:60;
+late_post_implant = 91:100;
 
 %% Locations
 locations = implant_files;
@@ -133,32 +137,12 @@ dist(ignore_elecs) = [];
 new_labels = all_elecs.master_labels;
 new_labels(ignore_elecs) = [];
 closest_elecs(ignore_elecs) = [];
+all_counts(ignore_elecs,:) = [];
 
 %% Find those electrodes with a substantial increase in spike rate
 min_rel_change = mean(rel_change) + n_std*std(rel_change);
 elec_inc = find(rel_change > min_rel_change);
 
-%% Get the Spearman rank correlation between the relative change and 1/dist vectors
-inv_dist = 1./dist;
-[rho,pval] = corr(rel_change,dist,'Type','Spearman');
-if 1
-figure
-scatter(rel_change,dist,'filled')
-for i = 1:length(new_labels)
-    if 1%rel_change(i) > min_rel_change
-        text(rel_change(i),dist(i),new_labels{i},'fontsize',15)
-    end
-end
-if pval<0.001
-    title(sprintf('%s\nSpearman rank correlation: rho = %1.1f, p < 0.001',pt_name,rho))
-else
-    title(sprintf('%s\nSpearman rank correlation: rho = %1.1f, p = %1.3f',pt_name,rho,pval))
-end
-
-xlabel('Relative change in spike count')
-ylabel('Distance from closest new electrodes')
-set(gca,'fontsize',20);
-end
 
 %% List the top 5 spike rate increase electrodes
 if 1
@@ -166,6 +150,10 @@ if 1
 for i = 1:5
     
     fprintf('\nHigh spike rate increase electrode: %s\n',new_labels{big_inc(i)});
+    
+    % Get the anatomical location
+    master_idx = find(strcmp(pt(p).master_elecs.master_labels,new_labels{big_inc(i)}));
+    fprintf('\nThis electrode is in: %s\n',pt(p).master_elecs.locs(master_idx).anatomic);
    
     % Get its nearest electrode
     close = closest_elecs(big_inc(i));
@@ -243,7 +231,7 @@ if p_val == 0
     p_val = 1/(nboot+1);
 end
 
-if 1
+if 0
     figure
     plot(dist_boot,'o')
     hold on
@@ -258,6 +246,71 @@ if 1
     set(gca,'fontsize',20);
 end
 
+%% Non-bootstrap test - independent two-sample t-test and Wilcoxon rank sum
+% Compare the distances between the high increase electrodes and low
+[~,pvaltt,~,stats_tt] = ttest2(dist(rel_change > min_rel_change),dist(rel_change <= min_rel_change));
+fprintf('\nUsing a two-sample t-test, p-value is %1.3f\n',pvaltt);
+tstat = stats_tt.tstat;
+
+[pvalrs,~,stats] = ranksum(dist(rel_change > min_rel_change),dist(rel_change <= min_rel_change));
+fprintf('\nUsing a Wilcoxon rank sum test, p-value is %1.3f\n',pvalrs);
+
+
+if do_plot
+figure
+scatter(rel_change,dist,'filled')
+for i = 1:length(new_labels)
+    if 1%rel_change(i) > min_rel_change
+        text(rel_change(i),dist(i),new_labels{i},'fontsize',15)
+    end
+end
+%
+%[rho,pval] = corr(rel_change,dist,'Type','Spearman');
+if pvaltt<0.001
+    title(sprintf('T-test p-value < 0.001'))
+    %title(sprintf('%s\nSpearman rank correlation: rho = %1.1f, p < 0.001',pt_name,rho))
+else
+    title(sprintf('T-test p-value %1.3f',pvaltt))
+    %title(sprintf('%s\nSpearman rank correlation: rho = %1.1f, p = %1.3f',pt_name,rho,pval))
+end
+%}
+
+
+xlabel('Relative change in spike count')
+ylabel('Distance from closest new electrodes')
+set(gca,'fontsize',20);
+print(gcf,[results_folder,'increase_distance/',sprintf('%s',pt_name)],'-dpng')
 end
 
+end
+
+
+%% Now see if these electrode spike rates (1) decrease after implantation and (2) decrease more than most electrodes
+% Compare the spike rates early and late post-implant
+early_rate_special = mean(mean(all_counts(rel_change > min_rel_change,early_post_implant)));
+late_rate_special = mean(mean(all_counts(rel_change > min_rel_change,late_post_implant)));
+fprintf('\n\nThe average early post-implant spike rate of highest relative increase is %1.1f per period.\n',early_rate_special);
+fprintf('\n\nThe average late post-implant spike rate of highest relative increase is %1.1f per period.\n',late_rate_special);
+
+%% Plot the spike rate in these channels over time
+if 1
+figure
+plot(mean(all_counts(rel_change > min_rel_change,:),1))
+hold on
+title('Average spike rates of highest rate increase electrodes')
+xlabel('Time period')
+ylabel('Number of spikes')
+set(gca,'fontsize',20)
+rp = plot([size(all_counts,2)/2 size(all_counts,2)/2],get(gca,'ylim'));
+legend(rp,'Re-implantation','fontsize',20)
+end
+
+%% Alternate approach - do electrodes close to new electrodes have higher spike rate increases?
+% No
+%{
+n_closest_elecs = round(perc_closest_elecs*length(dist));
+[~,sorted_dist_ind] = sort(dist);
+[~,pval,~,stats] = ttest2(rel_change(sorted_dist_ind(1:n_closest_elecs)),...
+    rel_change(sorted_dist_ind(n_closest_elecs+1:end)));
+%}
 end

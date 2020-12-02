@@ -130,7 +130,7 @@ elec_inc = find(rel_change > min_rel_change);
 %% Get mean distance from these electrodes to new electrodes
 dist_inc = mean(dist(elec_inc));
 
-if 0
+if 1
 %% Do a permutation test to get statistics
 % I will randomly choose the same number of electrodes to be my
 % "substantial increase electrodes" and calculate their mean distance and

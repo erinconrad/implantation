@@ -1,6 +1,7 @@
 function all_pts_overall_spikes
 
 %% Parameters
+which_pts = [1 8 9 10];
 pre_implant_idx = 50;
 post_implant_idx = 51;
 main_color = [0 0.4470 0.7410];
@@ -21,9 +22,9 @@ pt = load([data_folder,pt_file]);
 pt = pt.pt;
 
 %% Get counts for all the patients we can
+if isempty(which_pts)
 count = 0;
 all_counts = [];
-which_pts = [];
 for p = 1:length(pt)
     try total_count = overall_spike_rate(p);
         count = count + 1;
@@ -31,6 +32,18 @@ for p = 1:length(pt)
         which_pts = [which_pts,p];
     catch
         continue;
+    end
+end
+else
+    count = 0;
+    all_counts = [];
+    for p = which_pts
+        try total_count = overall_spike_rate(p);
+            count = count + 1;
+            all_counts = [all_counts;total_count];
+        catch
+            continue;
+        end
     end
 end
 
@@ -75,10 +88,12 @@ else
     
 end
 hold on
-rp = plot([50.5 50.5],get(gca,'ylim'),'linewidth',2);
-legend(rp,'Re-implantation','fontsize',20)
+
+
 ylabel('Spike counts')
 xlabel('Time since original implantation')
 set(gca,'fontsize',20)
-
+rp = plot([50.5 50.5],get(gca,'ylim'),'linewidth',2);
+legend(rp,'Re-implantation','fontsize',20)
+print(gcf,[results_folder,'overall_spike_rate/all_pts'],'-depsc')
 end

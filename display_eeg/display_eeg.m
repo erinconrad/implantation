@@ -1,9 +1,9 @@
 function display_eeg
 
 %% General parameters
-p = 3;
-f = [];
-start_time = [];
+p = 6;
+f = 1;
+start_time = 303635.04;
 display_time = 15;
 do_analysis = 1;
 
