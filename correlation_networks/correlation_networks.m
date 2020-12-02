@@ -100,12 +100,6 @@ for p = whichPts
             %% Filters
             values = do_filters(values,fs);
 
-            %% Remove artifact heavy channels
-            bad = rm_bad_chs(values);
-            values(:,bad) = [];
-            chLabels(bad) = [];
-            chIndices(bad) = [];
-
             %% Get Pearson correlation network
             adj = pearson_network(values);
             
