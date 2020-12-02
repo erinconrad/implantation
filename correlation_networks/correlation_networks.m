@@ -109,7 +109,7 @@ for p = whichPts
             %% Add to structure and save
             networks.networks(i).networks = [networks.networks(i).networks,adj];
             networks.networks(i).seconds(r) = s;
-            networks.networks(i).rand_index = r;
+            networks.networks(i).rand_index = r+1;
             networks.networks(i).time_index = i;
             networks.fs = fs;
             networks.networks(i).chLabels = chLabels;
