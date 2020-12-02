@@ -81,7 +81,7 @@ for p = whichPts
             s = randi([all_times(i,3) all_times(i,3)+all_times(i,4)]);
             
             %% Download data
-            data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
+            data = get_eeg(pt(p).ieeg_names{networks.networks(i).times(3)},...
                     pwname,[s s+net_time]);
                 
             values = data.values;
