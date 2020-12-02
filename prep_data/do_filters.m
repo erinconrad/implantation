@@ -17,7 +17,7 @@ f = designfilt('highpassiir','FilterOrder',4, ...
 %figure
 for i = 1:size(values,2)
    % plot(values(:,i))
-    hold on
+    %hold on
     values(:,i) = filtfilt(f,values(:,i));  
    % plot(values(:,i))
    % pause

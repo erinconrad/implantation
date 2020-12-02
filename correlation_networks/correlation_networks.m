@@ -76,6 +76,9 @@ for p = whichPts
         
         % Loop over the random indices within that 30 minute block
         for r = networks.networks(i).rand_index:nets_per_period
+            
+            fprintf('%s: Doing random second %d of %d of block %d of %d.\n',...
+                pt_name,r,nets_per_period,i,n_times);
         
             %% Get a random second within the 30 minute block
             s = randi([all_times(i,3) all_times(i,3)+all_times(i,4)]);
