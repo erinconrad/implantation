@@ -30,13 +30,17 @@ n_elecs = sum(change == 0 & ekg == 0);
 n_times = length(networks.networks);
 
 %% Initialize node strength array
-ns_all = zeros(n_elecs,n_times);
+ns_all = nan(n_elecs,n_times);
 
 % Loop over times
 for i = 1:length(networks.networks)
 
     % Get channel labels
     chLabels = networks.networks(i).chLabels;
+    
+    if isempty(chLabels)
+        continue;
+    end
     
     % Get change status of these labels
     change_status = zeros(length(chLabels),1);
