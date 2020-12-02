@@ -88,9 +88,9 @@ title('Node strength by electrode','fontsize',20)
 end
 
 %% Save new structure
-networks.name = pt_name;
-networks.ns = ns_all;
-save([network_folder,sprintf('%s_small.mat',pt_name)],'networks');
+small.name = pt_name;
+small.ns = ns_all;
+save([network_folder,sprintf('%s_small.mat',pt_name)],'small');
 
 
 
