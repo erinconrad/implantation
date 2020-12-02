@@ -1,5 +1,7 @@
 function changing_node_strength(p)
 
+do_plot = 0;
+
 pt_file = 'pt_w_elecs.mat';
 
 %% Locations
@@ -66,5 +68,26 @@ for i = 1:length(networks.networks)
     ns_all(:,i) = ns;
     
 end
+
+%% Raster plot
+if do_plot
+figure
+set(gcf,'position',[399 1 560 800])
+imagesc(ns_all);
+hold on
+yticks(1:size(ns_all,1))
+yticklabels(all_elecs.master_labels(all_elecs.change==0& ekg == 0))
+set(gca,'fontsize',10)
+xlabel('Time period','fontsize',20)
+ylabel('Electrode','fontsize',20)
+title('Node strength by electrode','fontsize',20)
+end
+
+%% Save new structure
+networks.name = pt_name;
+networks.ns = ns_all;
+save([network_folder,sprintf('%s_small.mat',pt_name)],'networks');
+
+
 
 end
