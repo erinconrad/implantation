@@ -31,6 +31,7 @@ n_times = length(networks.networks);
 
 %% Initialize node strength array
 ns_all = nan(n_elecs,n_times);
+ns_norm_all = nan(n_elecs,n_times);
 
 % Loop over times
 for i = 1:length(networks.networks)
@@ -56,11 +57,21 @@ for i = 1:length(networks.networks)
     % Average adjacency matrices for each 30 minute period
     adj = nanmean(networks.networks(i).networks,2);
     
+    % Also, normalize values (so that one really high correlation period
+    % doesn't throw off everything) - will be helpful to look for relative
+    % changes between electrodes
+    nets = networks.networks(i).networks;
+    nets_normalized = (nets - nanmean(nets,1))./nanstd(nets,0,1);
+    adj_norm = nanmean(nets_normalized,2);
+    
+    
     % Re-expand
     adj = flatten_or_expand_adj(adj);
+    adj_norm = flatten_or_expand_adj(adj_norm);
     
     % Only keep rows and columns that do not change
     adj_no_change = adj(no_change,no_change);
+    adj_norm_no_change = adj_norm(no_change,no_change);
     
     if size(adj_no_change,1) ~= n_elecs
         error('Sizes do not match')
@@ -68,8 +79,10 @@ for i = 1:length(networks.networks)
     
     % Get node strength
     ns = nansum(adj_no_change,1);
+    ns_norm = nansum(adj_norm_no_change,1);
     
     ns_all(:,i) = ns;
+    ns_norm_all(:,i) = ns_norm;
     
 end
 
@@ -90,6 +103,7 @@ end
 %% Save new structure
 small.name = pt_name;
 small.ns = ns_all;
+small.ns_norm = ns_norm_all;
 save([network_folder,sprintf('%s_small.mat',pt_name)],'small');
 
 
