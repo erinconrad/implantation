@@ -84,7 +84,12 @@ for i = 1:length(networks.networks)
     
     ns_all(:,i) = ns;
     ns_norm_all(:,i) = ns_norm;
-    ec_all(:,i) = compute_ec(adj_norm_no_change);
+    try
+        ec_all(:,i) = compute_ec(adj_norm_no_change);
+    catch
+        fprintf('\nWarning, nans for period %d\n',i);
+        ec_all(:,i) = nan;
+    end
     
 end
 
