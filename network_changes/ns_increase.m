@@ -19,8 +19,8 @@ pt_name = pt(p).name;
 small = load([network_folder,sprintf('%s_small.mat',pt_name)]);
 small = small.small;
 
-ns_norm = small.ns_norm;
-
+%ns_norm = small.ns_norm;
+ns_norm = small.ec;
 
 elecs = pt(p).master_elecs;
 change = elecs.change; % change status of electrodes
@@ -40,8 +40,8 @@ labels = labels(change == 0 & ekg == 0);
 %% Compare node strength before and after reimplantation
 % Num pre implant and postimplant
 num_pre = size(pt(p).pre_times,1);
-pre = mean(ns_norm(:,1:num_pre),2);
-post = mean(ns_norm(:,num_pre+1:end),2);
+pre = nanmean(ns_norm(:,1:num_pre),2);
+post = nanmean(ns_norm(:,num_pre+1:end),2);
 
 %% Compute relative change
 rel_change = (post-pre)./abs(pre);

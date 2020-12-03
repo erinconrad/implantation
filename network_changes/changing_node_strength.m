@@ -33,6 +33,7 @@ n_times = length(networks.networks);
 ns_all = nan(n_elecs,n_times);
 ns_norm_all = nan(n_elecs,n_times);
 ec_all = nan(n_elecs,n_times);
+ec_norm_all = nan(n_elecs,n_times);
 
 % Loop over times
 for i = 1:length(networks.networks)
@@ -85,9 +86,11 @@ for i = 1:length(networks.networks)
     ns_all(:,i) = ns;
     ns_norm_all(:,i) = ns_norm;
     try
-        ec_all(:,i) = compute_ec(adj_norm_no_change);
+        ec_all(:,i) = compute_ec(adj_no_change);
+        ec_norm_all(:,i) = compute_ec(adj_norm_no_change);
     catch
         fprintf('\nWarning, nans for period %d\n',i);
+        ec_norm_all(:,i) = nan;
         ec_all(:,i) = nan;
     end
     
@@ -112,6 +115,7 @@ small.name = pt_name;
 small.ns = ns_all;
 small.ns_norm = ns_norm_all;
 small.ec = ec_all;
+small.ec_norm = ec_norm_all;
 save([network_folder,sprintf('%s_small.mat',pt_name)],'small');
 
 
