@@ -171,6 +171,7 @@ for p = whichPts
             spikes.time_index = i;
             spikes.fs = fs;
             spikes.spikes(i).chLabels = chLabels;
+            spikes.spikes(i).chLabels_orig = data.chLabels(:,1);
             save([out_folder,fname],'spikes');
 
             %% Move to next start time

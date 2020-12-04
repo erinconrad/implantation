@@ -13,6 +13,6 @@ function out = rederive_original_chs(chIndices,out,chLabels,oldLabels)
     newLabels = chLabels(ch_new);
     oldLabels = oldLabels(original_channels);
     
-    if ~isequal(newLabels,oldLabels), error; end
+    if ~isequal(newLabels,oldLabels), error('what'); end
     
 end

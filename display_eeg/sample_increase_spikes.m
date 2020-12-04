@@ -1,7 +1,7 @@
 function sample_increase_spikes(all_p)
 
 %% General parameters
-n_sp_plot = 20;
+n_sp_plot = 10;
 n_per_fig = 10;
 surround = 7.5;
 min_sp = 10;
@@ -118,8 +118,9 @@ for p = all_p
             ind = randi(length(spikes.spikes));
             new_spikes = spikes.spikes(ind).new_spikes;
             if isempty(new_spikes), continue; end
-            
-            curr_labels = spikes.spikes(ind).chLabels;
+            f = spikes.spikes(ind).times(3);
+            %curr_labels = spikes.spikes(ind).chLabels;
+            curr_labels = all_elecs.labels{f};
             inc_chs = find(ismember(curr_labels,elec_inc_labels));
             spikes_on_inc_channels = ismember(new_spikes(:,2),inc_chs);
             
@@ -134,7 +135,7 @@ for p = all_p
         
         %% Get info about the spike
         curr_spike = curr_spikes(sp,:);
-        f = spikes.spikes(ind).times(3);
+        
         sp_time = curr_spike(1);
         sp_ch = curr_spike(2);
         sp_label = curr_labels{sp_ch};
@@ -144,21 +145,21 @@ for p = all_p
         values = data.values;
         chLabels = data.chLabels(:,1);
         
-        %if ~isequal(chLabels,curr_labels), error('what'); end
+        if ~isequal(chLabels,curr_labels), error('what'); end
         chIndices = 1:size(values,2);
         fs = data.fs;
 
         sp_index = surround*fs;
         
         % Get the correct index of the spike
-        id = strcmp(sp_label,chLabels);
+        %id = strcmp(sp_label,chLabels);
 
         %% Plot data
         axes(ha(b))
-        plot(linspace(0,surround*2,size(values,1)),values(:,id),'linewidth',2);
+        plot(linspace(0,surround*2,size(values,1)),values(:,sp_ch),'linewidth',2);
         hold on
         plot(surround,values(round(sp_index),sp_ch),'o','markersize',10)
-        title(sprintf('Spike %d %1.1f s %s index %d file %d',sp,sp_time,chLabels{id},ind,f),'fontsize',10)
+        title(sprintf('Spike %d %1.1f s %s index %d file %d',sp,sp_time,chLabels{sp_ch},ind,f),'fontsize',10)
         if b ~= n_per_fig
             xticklabels([])
         end

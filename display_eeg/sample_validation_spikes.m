@@ -68,6 +68,8 @@ for p = all_p
         fs = data.fs;
 
         sp_index = surround*fs;
+        
+        if ~isequal(chLabels,spikes.spikes(ind).chLabels), error('what'); end
 
         %% Plot data
         axes(ha(b))
