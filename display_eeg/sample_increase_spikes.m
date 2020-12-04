@@ -1,7 +1,7 @@
 function sample_increase_spikes(all_p)
 
 %% General parameters
-n_sp_plot = 10;
+n_sp_plot = 20;
 n_per_fig = 10;
 surround = 7.5;
 min_sp = 10;
