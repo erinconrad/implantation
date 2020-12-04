@@ -23,7 +23,7 @@ pt = pt.pt;
 
 for p = all_p
     pt_name = pt(p).name;
-    out_folder = [results_folder,'validation/',pt_name,'/'];
+    out_folder = [results_folder,'validation-increase/',pt_name,'/'];
     if exist(out_folder,'dir') == 0, mkdir(out_folder); end
 
     %% Load spike file
