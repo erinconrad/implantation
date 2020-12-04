@@ -121,7 +121,11 @@ for p = all_p
             f = spikes.spikes(ind).times(3);
             %curr_labels = spikes.spikes(ind).chLabels;
             curr_labels = all_elecs.labels{f};
-            inc_chs = find(ismember(curr_labels,elec_inc_labels));
+            
+            % Pick a random increase electrode
+            elec = randi(length(elec_inc_labels));
+            
+            inc_chs = find(strcmp(curr_labels,elec_inc_labels(elec)));
             spikes_on_inc_channels = ismember(new_spikes(:,2),inc_chs);
             
             if sum(spikes_on_inc_channels) > 0

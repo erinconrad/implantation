@@ -50,6 +50,18 @@ post = nanmean(ns_norm(:,num_pre+1:end),2);
 %% Compute relative change
 rel_change = (post-pre)./abs(pre);
 
+%% Find those electrodes with a substantial decrease in node strength
+%{
+Need to think about best way to turn this into a two tailed test
+%}
+max_rel_change = mean(rel_change) - n_std*std(rel_change);
+elec_dec = find(rel_change < max_rel_change);
+
+%% Non-bootstrap test - independent two-sample t-test and Wilcoxon rank sum
+% Compare the distances between the high increase electrodes and low
+[~,pvaltt,~,stats_tt] = ttest2(dist(rel_change < max_rel_change),dist(rel_change >= max_rel_change));
+fprintf('\nUsing a two-sample t-test, p-value is %1.3f\n',pvaltt);
+tstat = stats_tt.tstat;
 %{
 %% Find those electrodes with a substantial increase in spike rate
 min_rel_change = mean(rel_change) + n_std*std(rel_change);

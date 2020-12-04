@@ -22,8 +22,9 @@ goes along with closer electrodes having greater increase in spike rate.
 
 %% Parameters
 do_plot = 1;
-min_sp = 10;
+min_sp = 100;
 n_std = 2;
+top_perc = 5;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
 do_rel = 1;
@@ -124,14 +125,17 @@ non_ekg_chs = get_non_ekg_chs(pt(p).master_elecs.master_labels);
 ekg_chs = logical(~non_ekg_chs);
 
 % Ignore channels for which number of spikes is less than minimum
-few_spikes = logical(pre+post < min_sp);
+%few_spikes = logical(pre+post < min_sp);
 
 % Ignore channels that are not always there
 changing_elecs = logical(all_elecs.change ~= 0);
 % Combine things I'm ignoring
-ignore_elecs = few_spikes | changing_elecs | ekg_chs;
+%ignore_elecs = few_spikes | changing_elecs | ekg_chs;
+ignore_elecs = changing_elecs | ekg_chs;
 
 % Remove electrodes from both rel_change and dist
+pre(ignore_elecs) = [];
+post(ignore_elecs) = [];
 rel_change(ignore_elecs) = [];
 dist(ignore_elecs) = [];
 new_labels = all_elecs.master_labels;
@@ -141,8 +145,15 @@ all_counts(ignore_elecs,:) = [];
 
 %% Find those electrodes with a substantial increase in spike rate
 min_rel_change = mean(rel_change) + n_std*std(rel_change);
-elec_inc = find(rel_change > min_rel_change);
-
+%{
+[~,I] = sort(rel_change);
+num_special = round(length(I)*top_perc/100);
+elec_inc = I(end-num_special:end);
+special = ismember(1:length(I),elec_inc);
+%}
+special = rel_change > min_rel_change & pre+post > min_sp;
+elec_inc = find(special);
+%}
 
 %% List the top 5 spike rate increase electrodes
 if 1
@@ -248,11 +259,11 @@ end
 
 %% Non-bootstrap test - independent two-sample t-test and Wilcoxon rank sum
 % Compare the distances between the high increase electrodes and low
-[~,pvaltt,~,stats_tt] = ttest2(dist(rel_change > min_rel_change),dist(rel_change <= min_rel_change));
+[~,pvaltt,~,stats_tt] = ttest2(dist(special),dist(~special));
 fprintf('\nUsing a two-sample t-test, p-value is %1.3f\n',pvaltt);
 tstat = stats_tt.tstat;
 
-[pvalrs,~,stats] = ranksum(dist(rel_change > min_rel_change),dist(rel_change <= min_rel_change));
+[pvalrs,~,stats] = ranksum(dist(special),dist(~special));
 fprintf('\nUsing a Wilcoxon rank sum test, p-value is %1.3f\n',pvalrs);
 
 
@@ -261,7 +272,11 @@ figure
 scatter(rel_change,dist,'filled')
 for i = 1:length(new_labels)
     if 1%rel_change(i) > min_rel_change
-        text(rel_change(i),dist(i),new_labels{i},'fontsize',15)
+        if special(i) == 1
+            text(rel_change(i),dist(i),new_labels{i},'fontsize',15,'color','b')
+        else
+            text(rel_change(i),dist(i),new_labels{i},'fontsize',15)
+        end
     end
 end
 %
@@ -284,7 +299,7 @@ end
 
 end
 
-
+if 0 
 %% Now see if these electrode spike rates (1) decrease after implantation and (2) decrease more than most electrodes
 % Compare the spike rates early and late post-implant
 early_rate_special = mean(mean(all_counts(rel_change > min_rel_change,early_post_implant)));
@@ -303,6 +318,7 @@ ylabel('Number of spikes')
 set(gca,'fontsize',20)
 rp = plot([size(all_counts,2)/2 size(all_counts,2)/2],get(gca,'ylim'));
 legend(rp,'Re-implantation','fontsize',20)
+end
 end
 
 %% Alternate approach - do electrodes close to new electrodes have higher spike rate increases?
