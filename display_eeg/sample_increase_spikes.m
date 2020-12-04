@@ -95,8 +95,8 @@ for p = all_p
 
     %% Find those electrodes with a substantial increase in spike rate
     min_rel_change = mean(rel_change(~ignore_elecs)) + n_std*std(rel_change(~ignore_elecs));
-    elec_inc = find(rel_change > min_rel_change & ~ignore_elecs);
-
+    elec_inc = (rel_change > min_rel_change & ~ignore_elecs);
+    elec_inc_labels = new_labels(elec_inc);
     
     
     
@@ -118,7 +118,11 @@ for p = all_p
             ind = randi(length(spikes.spikes));
             new_spikes = spikes.spikes(ind).new_spikes;
             if isempty(new_spikes), continue; end
-            spikes_on_inc_channels = ismember(new_spikes(:,2),elec_inc);
+            
+            curr_labels = spikes.spikes(ind).chLabels;
+            inc_chs = find(ismember(curr_labels,elec_inc_labels));
+            spikes_on_inc_channels = ismember(new_spikes(:,2),inc_chs);
+            
             if sum(spikes_on_inc_channels) > 0
                 break
             end
