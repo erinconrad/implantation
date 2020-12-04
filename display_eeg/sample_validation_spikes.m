@@ -9,7 +9,7 @@ surround = 7.5;
 
 %% Locations
 locations = implant_files;
-data_folder = [locations.main_folder,'data/'];
+data_folder = [locations.main_folder,'data/data_files/'];
 results_folder = [locations.main_folder,'results/'];
 pwname = locations.pwfile;
 addpath(genpath(locations.script_folder));
@@ -18,7 +18,7 @@ spike_folder = [results_folder,'spikes/'];
 
 
 %% Load pt file
-pt = load([data_folder,'pt.mat']);
+pt = load([data_folder,'pt_w_elecs.mat']);
 pt = pt.pt;
 
 for p = all_p
