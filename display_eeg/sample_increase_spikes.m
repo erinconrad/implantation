@@ -137,22 +137,28 @@ for p = all_p
         f = spikes.spikes(ind).times(3);
         sp_time = curr_spike(1);
         sp_ch = curr_spike(2);
+        sp_label = curr_labels{sp_ch};
 
         %% Get the EEG data
         data = get_eeg(pt(p).ieeg_names{f},pwname,[sp_time-surround sp_time+surround]);
         values = data.values;
         chLabels = data.chLabels(:,1);
+        
+        %if ~isequal(chLabels,curr_labels), error('what'); end
         chIndices = 1:size(values,2);
         fs = data.fs;
 
         sp_index = surround*fs;
+        
+        % Get the correct index of the spike
+        id = strcmp(sp_label,chLabels);
 
         %% Plot data
         axes(ha(b))
-        plot(linspace(0,surround*2,size(values,1)),values(:,sp_ch),'linewidth',2);
+        plot(linspace(0,surround*2,size(values,1)),values(:,id),'linewidth',2);
         hold on
         plot(surround,values(round(sp_index),sp_ch),'o','markersize',10)
-        title(sprintf('Spike %d %1.1f s %s index %d file %d',sp,sp_time,chLabels{sp_ch},ind,f),'fontsize',10)
+        title(sprintf('Spike %d %1.1f s %s index %d file %d',sp,sp_time,chLabels{id},ind,f),'fontsize',10)
         if b ~= n_per_fig
             xticklabels([])
         end
