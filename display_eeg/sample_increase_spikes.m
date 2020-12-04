@@ -118,7 +118,7 @@ for p = all_p
             ind = randi(length(spikes.spikes));
             new_spikes = spikes.spikes(ind).new_spikes;
             spikes_on_inc_channels = ismember(new_spikes(:,2),elec_inc);
-            if ~isempty(spikes_on_inc_channels)
+            if sum(spikes_on_inc_channels) > 0
                 break
             end
         end
