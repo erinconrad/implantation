@@ -120,8 +120,8 @@ for p = all_p
             % Pick a random increase electrode
             elec = randi(length(elec_inc_labels));
             
-            ind = randi(length(spikes.spikes)/2);
-            new_spikes = spikes.spikes(length(spikes.spikes)/2 + ind).new_spikes;
+            ind = randi(length(spikes.spikes)/2)+length(spikes.spikes)/2;
+            new_spikes = spikes.spikes(ind).new_spikes;
             if isempty(new_spikes), continue; end
             f = spikes.spikes(ind).times(3);
             curr_labels = all_elecs.labels{f};
