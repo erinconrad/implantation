@@ -107,6 +107,30 @@ for p = all_p
 
         
     for j = 1:length(elec_inc_labels)
+        
+
+        %% Retrieve only the spikes from these channels - look at all spikes from these channels
+        % Just in the second half
+        elec = j;
+
+        spikes_on_ch = [];
+        for s = length(spikes.spikes)/2+1:length(spikes.spikes)
+            new_spikes = spikes.spikes(s).spikes;
+            if isempty(new_spikes), continue; end
+            f = spikes.spikes(s).times(3);
+            curr_labels = all_elecs.labels{f};
+
+            inc_chs = find(strcmp(curr_labels,elec_inc_labels(elec)));
+            spikes_on_inc_channels = ismember(new_spikes(:,2),inc_chs);
+
+            spikes_on_ch = [spikes_on_ch;...
+                new_spikes(spikes_on_inc_channels,:),...
+                repmat(s,length(new_spikes(spikes_on_inc_channels,1)),1),...
+                repmat(f,length(new_spikes(spikes_on_inc_channels,1)),1)];
+        end
+        
+        %if j == 3, error('what'); end
+            
         for k = 1:n_per_ch
             which_per_plot = which_per_plot + 1;
              b = mod(which_per_plot,n_per_fig);
@@ -118,9 +142,13 @@ for p = all_p
                 b = n_per_fig; 
             end
 
-
-            %% Retrieve only the spikes from these channels
-            elec = j;
+            sp = randi(size(spikes_on_ch,1));
+            sp_time = spikes_on_ch(sp,1);
+            sp_ch = spikes_on_ch(sp,2);
+            f = spikes_on_ch(sp,4);
+            ind = spikes_on_ch(sp,3);
+            
+            %{
             while 1
 
                 % Pick a random increase electrode
@@ -139,6 +167,7 @@ for p = all_p
                     break
                 end
             end
+            %if j == 3, error('what'); end
             curr_spikes = new_spikes(spikes_on_inc_channels,:);
 
             sp = randi(size(curr_spikes,1));
@@ -150,15 +179,21 @@ for p = all_p
             sp_time = curr_spike(1);
             sp_ch = curr_spike(2);
             sp_label = curr_labels{sp_ch};
+            %}
 
             %% Get the EEG data
             data = get_eeg(pt(p).ieeg_names{f},pwname,[sp_time-surround sp_time+surround]);
             values = data.values;
             chLabels = data.chLabels(:,1);
+            
+            
 
-            if ~isequal(chLabels,curr_labels), error('what'); end
+            %if ~isequal(chLabels,curr_labels), error('what'); end
             chIndices = 1:size(values,2);
             fs = data.fs;
+            
+            %% Filters
+            values = do_filters(values,fs);
 
             sp_index = surround*fs;
 
