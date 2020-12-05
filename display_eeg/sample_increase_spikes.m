@@ -1,7 +1,8 @@
 function sample_increase_spikes(all_p)
 
 %% General parameters
-n_sp_plot = 20;
+%n_sp_plot = 20;
+n_per_ch = 5;
 n_per_fig = 10;
 surround = 7.5;
 min_sp = 10;
@@ -99,85 +100,93 @@ for p = all_p
     elec_inc_labels = new_labels(elec_inc);
     
     
-    
+    n_sp_plot = n_per_ch * sum(elec_inc);
     
     which_plot = 0;
+    which_per_plot = 0;
     for i = 1:n_sp_plot
 
-        b = mod(i,n_per_fig);
-        if b == 1
-            figure
-            set(gcf,'position',[0 0 1400 800])
-            [ha,~] = tight_subplot(n_per_fig,1,[0.02 0.02],[0.05 0.05],[0.02 0.02]);
-        elseif b == 0
-            b = n_per_fig; 
-        end
+       
         
-        %% Retrieve only the spikes from these channels
-        
-        while 1
-            
-            % Pick a random increase electrode
-            elec = randi(length(elec_inc_labels));
-            
-            ind = randi(length(spikes.spikes)/2)+length(spikes.spikes)/2;
-            new_spikes = spikes.spikes(ind).new_spikes;
-            if isempty(new_spikes), continue; end
-            f = spikes.spikes(ind).times(3);
-            curr_labels = all_elecs.labels{f};
-
-            inc_chs = find(strcmp(curr_labels,elec_inc_labels(elec)));
-            spikes_on_inc_channels = ismember(new_spikes(:,2),inc_chs);
-            
-            if sum(spikes_on_inc_channels) > 0
-                break
+        for j = 1:length(elec_inc_labels)
+            which_per_plot = which_per_plot + 1;
+             b = mod(which_per_plot,n_per_fig);
+            if b == 1
+                figure
+                set(gcf,'position',[0 0 1400 800])
+                [ha,~] = tight_subplot(n_per_fig,1,[0.02 0.02],[0.05 0.05],[0.02 0.02]);
+            elseif b == 0
+                b = n_per_fig; 
             end
+            
+            
+            %% Retrieve only the spikes from these channels
+            elec = j;
+            while 1
+
+                % Pick a random increase electrode
+                %elec = randi(length(elec_inc_labels));
+
+                ind = randi(length(spikes.spikes)/2)+length(spikes.spikes)/2;
+                new_spikes = spikes.spikes(ind).new_spikes;
+                if isempty(new_spikes), continue; end
+                f = spikes.spikes(ind).times(3);
+                curr_labels = all_elecs.labels{f};
+
+                inc_chs = find(strcmp(curr_labels,elec_inc_labels(elec)));
+                spikes_on_inc_channels = ismember(new_spikes(:,2),inc_chs);
+
+                if sum(spikes_on_inc_channels) > 0
+                    break
+                end
+            end
+            curr_spikes = new_spikes(spikes_on_inc_channels,:);
+
+            sp = randi(size(curr_spikes,1));
+
+
+            %% Get info about the spike
+            curr_spike = curr_spikes(sp,:);
+
+            sp_time = curr_spike(1);
+            sp_ch = curr_spike(2);
+            sp_label = curr_labels{sp_ch};
+
+            %% Get the EEG data
+            data = get_eeg(pt(p).ieeg_names{f},pwname,[sp_time-surround sp_time+surround]);
+            values = data.values;
+            chLabels = data.chLabels(:,1);
+
+            if ~isequal(chLabels,curr_labels), error('what'); end
+            chIndices = 1:size(values,2);
+            fs = data.fs;
+
+            sp_index = surround*fs;
+
+            % Get the correct index of the spike
+            %id = strcmp(sp_label,chLabels);
+
+            %% Plot data
+            axes(ha(b))
+            plot(linspace(0,surround*2,size(values,1)),values(:,sp_ch),'linewidth',2);
+            hold on
+            plot(surround,values(round(sp_index),sp_ch),'o','markersize',10)
+            title(sprintf('Spike %d %1.1f s %s index %d file %d',sp,sp_time,chLabels{sp_ch},ind,f),'fontsize',10)
+            if b ~= n_per_fig
+                xticklabels([])
+            end
+            yticklabels([])
+            set(gca,'fontsize',10)
+
+            if b == n_per_fig
+                xlabel('Time (s)')
+                which_plot = which_plot + 1;
+                which_per_plot = 0;
+                print([out_folder,sprintf('spikes_%d',which_plot)],'-depsc');
+                close(gcf)
+            end
+        
         end
-        curr_spikes = new_spikes(spikes_on_inc_channels,:);
-
-        sp = randi(size(curr_spikes,1));
-        
-        
-        %% Get info about the spike
-        curr_spike = curr_spikes(sp,:);
-        
-        sp_time = curr_spike(1);
-        sp_ch = curr_spike(2);
-        sp_label = curr_labels{sp_ch};
-
-        %% Get the EEG data
-        data = get_eeg(pt(p).ieeg_names{f},pwname,[sp_time-surround sp_time+surround]);
-        values = data.values;
-        chLabels = data.chLabels(:,1);
-        
-        if ~isequal(chLabels,curr_labels), error('what'); end
-        chIndices = 1:size(values,2);
-        fs = data.fs;
-
-        sp_index = surround*fs;
-        
-        % Get the correct index of the spike
-        %id = strcmp(sp_label,chLabels);
-
-        %% Plot data
-        axes(ha(b))
-        plot(linspace(0,surround*2,size(values,1)),values(:,sp_ch),'linewidth',2);
-        hold on
-        plot(surround,values(round(sp_index),sp_ch),'o','markersize',10)
-        title(sprintf('Spike %d %1.1f s %s index %d file %d',sp,sp_time,chLabels{sp_ch},ind,f),'fontsize',10)
-        if b ~= n_per_fig
-            xticklabels([])
-        end
-        yticklabels([])
-        set(gca,'fontsize',10)
-
-        if b == n_per_fig
-            xlabel('Time (s)')
-            which_plot = which_plot + 1;
-            print([out_folder,sprintf('spikes_%d',which_plot)],'-depsc');
-            close(gcf)
-        end
-        
         
     end
     
