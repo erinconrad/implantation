@@ -104,11 +104,10 @@ for p = all_p
     
     which_plot = 0;
     which_per_plot = 0;
-    for i = 1:n_sp_plot
 
-       
         
-        for j = 1:length(elec_inc_labels)
+    for j = 1:length(elec_inc_labels)
+        for k = 1:n_per_ch
             which_per_plot = which_per_plot + 1;
              b = mod(which_per_plot,n_per_fig);
             if b == 1
@@ -118,8 +117,8 @@ for p = all_p
             elseif b == 0
                 b = n_per_fig; 
             end
-            
-            
+
+
             %% Retrieve only the spikes from these channels
             elec = j;
             while 1
@@ -186,8 +185,8 @@ for p = all_p
                 close(gcf)
             end
         
-        end
         
+        end 
     end
     
 end
