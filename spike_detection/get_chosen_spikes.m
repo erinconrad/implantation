@@ -5,7 +5,7 @@ function get_chosen_spikes(overwrite,whichPts)
 %running through 9
 
 %% General parameters
-%whichPts = [1 3 5 6 8 9 10 11]; % I believe these are the pts with all available data
+whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
 add_clean_times = 0;
 batch_time = 60;
 pt_file = 'pt_w_elecs.mat';
@@ -14,7 +14,7 @@ pt_file = 'pt_w_elecs.mat';
 tmul = 15;
 absthresh = 300;
 min_chs = 2; % min number of channels
-max_ch_pct = 80; % if spike > 80% of channels, throw away
+max_ch_pct = 50; % if spike > 50% of channels, throw away
 
 %% Locations
 locations = implant_files;
@@ -90,7 +90,7 @@ for p = whichPts
     for i = curr_index:n_times
 
         start_time = spikes.spikes(i).start_time;
-
+        
         %fprintf('\nDoing time %d  of %d \n',curr_index,n_times);
 
         
@@ -103,8 +103,10 @@ for p = whichPts
             % Wrap it in a try catch loop to look for internal server
             % errors and move to the next second
             
+
             data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
                     pwname,[start_time start_time+batch_time]);
+            %}
             %}
                
             %{
@@ -139,15 +141,19 @@ for p = whichPts
             fs = data.fs;
 
             non_ekg_chs = get_non_ekg_chs(chLabels);
-            values(:,~non_ekg_chs) = [];
-            chLabels(~non_ekg_chs) = [];
-            chIndices(~non_ekg_chs) = [];
+           % values(:,~non_ekg_chs) = [];
+           % chLabels(~non_ekg_chs) = [];
+           % chIndices(~non_ekg_chs) = [];
+            
+            
 
             %% Filters
             values = do_filters(values,fs);
-
+            orig_values = values;
+            
             %% Remove artifact heavy channels
-            bad = rm_bad_chs(values);
+            bad = rm_bad_chs(values,fs,chLabels);
+            bad(~non_ekg_chs) = 1;
             values(:,bad) = [];
             chLabels(bad) = [];
             chIndices(bad) = [];
@@ -157,6 +163,13 @@ for p = whichPts
 
             if ~isempty(out)
 
+                %% Spikes on EKG
+                
+                ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100);
+                if ~isempty(ekg_spikes)
+                all_spikes = remove_ekg(all_spikes,ekg_spikes,fs);
+                end
+                
                 %% Adjust times of spikes
                 out = adjust_spike_times(out,start_time,fs);
 

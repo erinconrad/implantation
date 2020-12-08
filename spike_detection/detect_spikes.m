@@ -22,7 +22,7 @@ lfr    = 7;  % low pass filter for slow wave component
 aftdur = 70;
 aftdur   = aftdur*rate/1000;   % convert to points;
 spikedur = 10; % minimum spike duration in points
-fn_fr  = 10; % high pass filter for spikey component
+fn_fr  = 8; % high pass filter for spikey component
 
 % Initialize things
 all_spikes  = [];
@@ -40,6 +40,7 @@ for dd = 1:n_chans
         %% re-adjust the mean of the data to be zero (if there is a weird dc shift)
         data = data - mean(data);
 
+     %   plot(data);
         %% Run the spike detector
 
         spikes   = [];
@@ -168,12 +169,14 @@ for dd = 1:n_chans
 
        all_spikes = [all_spikes;out];
 
-    if 1== 0 && dd == 1
+    if 1== 0 && dd == 89
         figure
         plot_times = 1:15*srate;
         plot(linspace(0,15,length(plot_times)),data(plot_times))
         hold on
         plot(linspace(0,15,length(plot_times)),HFdata(plot_times))
+        hold on
+        plot(linspace(0,15,length(plot_times)),fndata(plot_times))
         error('look\n');
     end
        

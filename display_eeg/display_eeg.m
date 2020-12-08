@@ -2,16 +2,16 @@ function display_eeg
 
 %% General parameters
 p = 6;
-f = 1;
-start_time = 303635.04;
-display_time = 15;
+f = [];
+start_time = 660450.10;
+display_time = 60;
 do_analysis = 1;
 
 %% Spike detector parameters
 tmul = 15;
 absthresh = 300;
 min_chs = 2; % min number of channels
-max_ch_pct = 80; % if spike > 80% of channels, throw away
+max_ch_pct = 80; % if spike > 20% of channels, throw away
 
 %% Locations
 locations = implant_files;
@@ -50,30 +50,48 @@ while 1
     
     if do_analysis
         non_ekg_chs = get_non_ekg_chs(chLabels);
-        values(:,~non_ekg_chs) = [];
-        chLabels(~non_ekg_chs) = [];
-        chIndices(~non_ekg_chs) = [];
-
+        
+        
         %% Filters
         values = do_filters(values,fs);
         orig_values = values;
         orig_labels = chLabels;
-
-        %% Remove artifact heavy channels
         
-        bad = rm_bad_chs(values);
+        %% Remove artifact heavy channels
+
+        
+        bad = rm_bad_chs(values,fs,chLabels);
+        bad(~non_ekg_chs) = 1;
         values(:,bad) = [];
         chLabels(bad) = [];
         chIndices(bad) = [];
+        
+        %{
+        values(:,~non_ekg_chs) = [];
+        chLabels(~non_ekg_chs) = [];
+        chIndices(~non_ekg_chs) = [];
         %}
+        
+
+        %}
+        
+        
 
         %% Spike detection
         all_spikes = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct);
-
-        %% Re-derive original channels
+        
         if ~isempty(all_spikes)
+            %% Spikes on EKG
+            
+            ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100);
+            if ~isempty(ekg_spikes)
+            all_spikes = remove_ekg(all_spikes,ekg_spikes,fs);
+            end
+
+            %% Re-derive original channels
             out = rederive_original_chs(chIndices,all_spikes,chLabels,data.chLabels(:,1));
         else
+            
             out = [];
         end
         toc
@@ -85,6 +103,8 @@ while 1
     %% Plot data
     %plot_signal(values,chLabels,display_time,all_spikes,fs,start_time)
     plot_signal(orig_values,orig_labels,display_time,out,fs,start_time,bad)
+    start_time
+    f
     fprintf('\nSpeed of %1.1f\n',display_time/toc);
     fprintf('\nPress any button to display next time\n');
     pause

@@ -24,6 +24,8 @@ for i = 1:size(values,2)
    % hold off
 end
 
+%% Common average reference
+%values = values - mean(values,2);
 
 
 end
