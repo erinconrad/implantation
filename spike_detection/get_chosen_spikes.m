@@ -167,7 +167,7 @@ for p = whichPts
                 
                 ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100);
                 if ~isempty(ekg_spikes)
-                all_spikes = remove_ekg(all_spikes,ekg_spikes,fs);
+                all_spikes = remove_ekg(out,ekg_spikes,fs);
                 end
                 
                 %% Adjust times of spikes
