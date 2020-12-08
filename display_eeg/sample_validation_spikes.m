@@ -31,6 +31,18 @@ for p = all_p
     spikes = spikes.spikes;
     %nspikes = size(spikes.spikes,1);
 
+    %% concatenate all spikes into one long thing
+    all_spikes = [];
+    for s = 1:length(spikes.spikes)
+        if isempty(spikes.spikes(s).spikes)
+            continue
+        end
+
+        all_spikes = [all_spikes;...
+            spikes.spikes(s).spikes,repmat(spikes.spikes(s).times(3),...
+            size(spikes.spikes(s).spikes,1),1),repmat(s,...
+            size(spikes.spikes(s).spikes,1),1)];
+    end
 
     which_plot = 0;
     for i = 1:n_sp_plot
@@ -44,21 +56,32 @@ for p = all_p
             b = n_per_fig; 
         end
 
+        
+        
+        
         %% Randomly pick spike
+        %{
         while 1
             ind = randi(length(spikes.spikes));
             if ~isempty(spikes.spikes(ind).spikes)
                 break
             end
         end
-        sp = randi(size(spikes.spikes(ind).spikes,1));
-        %sp = randi(nspikes);
+        %}
+        %sp = randi(size(spikes.spikes(ind).spikes,1));
+        sp = randi(size(all_spikes,1));
 
         %% Get info about the spike
+        %{
         curr_spike = spikes.spikes(ind).spikes(sp,:);
         f = spikes.spikes(ind).times(3);
         sp_time = curr_spike(1);
         sp_ch = curr_spike(2);
+        %}
+        f = all_spikes(sp,3);
+        sp_time = all_spikes(sp,1);
+        sp_ch = all_spikes(sp,2);
+        ind = all_spikes(sp,4);
 
         %% Get the EEG data
         data = get_eeg(pt(p).ieeg_names{f},pwname,[sp_time-surround sp_time+surround]);
@@ -69,7 +92,7 @@ for p = all_p
 
         sp_index = surround*fs;
         
-        if ~isequal(chLabels,spikes.spikes(ind).chLabels), error('what'); end
+     %  if ~isequal(chLabels,spikes.spikes(ind).chLabels), error('what'); end
 
         %% Plot data
         axes(ha(b))
