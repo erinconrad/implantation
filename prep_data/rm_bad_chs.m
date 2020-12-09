@@ -4,6 +4,9 @@ nchs = size(eeg,2);
 bad = zeros(nchs,1);
 thresh = 5;
 
+max_amp = 1e3;
+max_sum_over_power = 1e2*size(eeg,1)/7500;
+
 do_plot = 0;
 if do_plot == 1
     figure
@@ -20,35 +23,31 @@ for d = 1:nchs%1:nchs
     orig_power = (data.^2);
 
     
+    %% HF power check
+    alpha = 0.99;
+    hp = data(2:end) - alpha*data(1:end-1);
+    
+    all_power = sum(data.^2);
+    hp_power = sum(hp.^2);
+    power_ratio = hp_power/all_power;
+    
+    if power_ratio > 0.4
+        bad(d) = 1;
+    end
+    
+    %% Relative overall power check
     very_high_power = sum(orig_power > thresh*Y)/length(orig_power); 
     
     if very_high_power > 1e-1 %&& sum(orig_power>1e6)/length(orig_power) > 1e-3
         bad(d) = 1;
     end
     
-    %{
-    %% Get high frequency signal
-    %{
-    alpha = 0.99;
-    %hp = data(2:end) - alpha*data(1:end-1);
-    hp = highpass(data,50,fs);
-    hp_power = (hp.^2);
-    hp_above_thresh = sum(hp_power>1e3)/length(orig_power);
-    %}
-
-    %% Get low frequency signal
+    %% Absolute overall power check
+    over_power = sum(abs(data) > max_amp);
+    if over_power > max_sum_over_power
+        bad(d) = 1;
+    end
     
-    beta = 0.99;
-    %lp = (1-beta)*data(2:end) + beta*data(1:end-1);
-    %lp = lowpass(data,1e-5,fs);
-    lp = filter([1-beta],[1,-beta],data);
-    lp_power = (lp.^2);
-    
-    %% Get the fraction of the LF power above a threshold
-   % lp_above_thresh = sum(lp_power>1e4)/length(lp_power);
-    %}
-    
-    %}
     %% Plot
     %
     if do_plot == 1

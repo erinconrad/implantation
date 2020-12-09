@@ -5,7 +5,7 @@ function get_chosen_spikes(overwrite,whichPts)
 %running through 9
 
 %% General parameters
-whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
+%whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
 add_clean_times = 0;
 batch_time = 60;
 pt_file = 'pt_w_elecs.mat';

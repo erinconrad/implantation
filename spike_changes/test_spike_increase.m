@@ -22,7 +22,7 @@ goes along with closer electrodes having greater increase in spike rate.
 
 %% Parameters
 do_plot = 1;
-min_sp = 100;
+min_sp = 1e2;
 n_std = 2;
 top_perc = 5;
 nboot = 1e4;
@@ -259,12 +259,16 @@ end
 
 %% Non-bootstrap test - independent two-sample t-test and Wilcoxon rank sum
 % Compare the distances between the high increase electrodes and low
+if sum(special) > 0
 [~,pvaltt,~,stats_tt] = ttest2(dist(special),dist(~special));
 fprintf('\nUsing a two-sample t-test, p-value is %1.3f\n',pvaltt);
 tstat = stats_tt.tstat;
 
 [pvalrs,~,stats] = ranksum(dist(special),dist(~special));
 fprintf('\nUsing a Wilcoxon rank sum test, p-value is %1.3f\n',pvalrs);
+else
+    pvaltt = nan;
+end
 
 
 if do_plot
