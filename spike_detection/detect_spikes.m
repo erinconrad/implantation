@@ -17,12 +17,12 @@ chan   = 1:n_chans;
 
 spkdur = 220;                % spike duration must be less than this in ms
 spkdur = spkdur*rate/1000;   % convert to points;
-fr     = 40; % low pass filter for spikey component
+fr     = 20; % low pass filter for spikey component
 lfr    = 7;  % low pass filter for slow wave component
 aftdur = 150;
 aftdur   = aftdur*rate/1000;   % convert to points;
 spikedur = 20; % minimum spike duration in points
-fn_fr  = 6; % high pass filter for spikey component
+fn_fr  = 1; % high pass filter for spikey component
 
 % Initialize things
 all_spikes  = [];
