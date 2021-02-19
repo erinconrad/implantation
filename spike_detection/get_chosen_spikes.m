@@ -26,7 +26,7 @@ else
 end
 
 %% Spike detector parameters
-tmul = 15;
+tmul = 19;
 absthresh = 300;
 min_chs = 3; % min number of channels
 max_ch_pct = 50; % if spike > 50% of channels, throw away

@@ -19,9 +19,9 @@ spkdur = 220;                % spike duration must be less than this in ms
 spkdur = spkdur*rate/1000;   % convert to points;
 fr     = 40; % low pass filter for spikey component
 lfr    = 7;  % low pass filter for slow wave component
-aftdur = 70;
+aftdur = 150;
 aftdur   = aftdur*rate/1000;   % convert to points;
-spikedur = 30; % minimum spike duration in points
+spikedur = 20; % minimum spike duration in points
 fn_fr  = 6; % high pass filter for spikey component
 
 % Initialize things
