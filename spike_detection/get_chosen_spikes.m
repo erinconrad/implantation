@@ -1,20 +1,37 @@
 
 
-function get_chosen_spikes(overwrite,whichPts)
+function get_chosen_spikes
 
 %running through 9
 
 %% General parameters
-%whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
+doing_test = 0;
+whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
 add_clean_times = 0;
 batch_time = 60;
 pt_file = 'pt_w_elecs.mat';
 
+%% Test parameters
+if doing_test
+    test_pt = 'HUP78_phaseII';
+    do_plots = 1;
+    test_time = 402536.90;
+    test_label = [];%'LG59';%[];%'AST1';
+    do_save = 0;
+    overwrite = 1;
+else
+    do_save = 1;
+    do_plots = 0;
+    overwrite = 1;
+end
+
 %% Spike detector parameters
 tmul = 15;
 absthresh = 300;
-min_chs = 2; % min number of channels
+min_chs = 3; % min number of channels
 max_ch_pct = 50; % if spike > 50% of channels, throw away
+
+display_time = 60;
 
 %% Locations
 locations = implant_files;
@@ -36,7 +53,9 @@ end
 for p = whichPts
 
     pt_name = pt(p).name;
-    fname = sprintf('%s_spikes.mat',pt_name);
+    if ~doing_test
+        fname = sprintf('%s_spikes.mat',pt_name);
+    end
     
     %% Add clean times to structure
     if add_clean_times == 1
@@ -89,23 +108,34 @@ for p = whichPts
     
     for i = curr_index:n_times
 
-        start_time = spikes.spikes(i).start_time;
+        if doing_test
+            end_time = inf;
+            start_time = test_time;
+        else
+            start_time = spikes.spikes(i).start_time;
+            end_time = spikes.spikes(i).times(2);
+        end
         
         %fprintf('\nDoing time %d  of %d \n',curr_index,n_times);
 
         
-        while start_time < spikes.spikes(i).times(2)
-            
-            fprintf('\nDoing %1.1f of %1.1f s of %d of %d\n',start_time-spikes.spikes(i).times(1),...
-                spikes.spikes(i).times(2)-spikes.spikes(i).times(1),i,n_times);
+        while start_time < end_time
+            if ~doing_test
+                fprintf('\nDoing %1.1f of %1.1f s of %d of %d\n',start_time-spikes.spikes(i).times(1),...
+                    spikes.spikes(i).times(2)-spikes.spikes(i).times(1),i,n_times);
+            end
             
             %% Download data
             % Wrap it in a try catch loop to look for internal server
             % errors and move to the next second
             
 
-            data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
-                    pwname,[start_time start_time+batch_time]);
+            if doing_test
+                data = get_eeg(test_pt,pwname,[start_time start_time+batch_time]);
+            else
+                data = get_eeg(pt(p).ieeg_names{spikes.spikes(i).times(3)},...
+                        pwname,[start_time start_time+batch_time]);
+            end
             %}
             %}
                
@@ -137,45 +167,76 @@ for p = whichPts
                     %}
             values = data.values;
             chLabels = data.chLabels(:,1);
+            orig_labels = chLabels;
+            chLabels = clean_labels(chLabels);
+            new_orig_labels  = chLabels;
+            
+            if ~isequal(chLabels,orig_labels)
+                fprintf('\nCleaned channel labels:\n');
+                [orig_labels,chLabels]
+            end
+            
             chIndices = 1:size(values,2);
             fs = data.fs;
-
-            non_ekg_chs = get_non_ekg_chs(chLabels);
-           % values(:,~non_ekg_chs) = [];
-           % chLabels(~non_ekg_chs) = [];
-           % chIndices(~non_ekg_chs) = [];
             
-            
-
             %% Filters
-            values = do_filters(values,fs);
+            values = do_filters(values,fs,chLabels);
+            
             orig_values = values;
+            non_ekg_chs = get_non_ekg_chs(chLabels);
+            bad = zeros(length(chLabels),1);
+            if 1
+                values(:,~non_ekg_chs) = [];
+                chLabels(~non_ekg_chs) = [];
+                chIndices(~non_ekg_chs) = [];
+            end
+            
+            
+
+            
+            
+           
             
             %% Remove artifact heavy channels
-            bad = rm_bad_chs(values,fs,chLabels);
-            bad(~non_ekg_chs) = 1;
-            values(:,bad) = [];
-            chLabels(bad) = [];
-            chIndices(bad) = [];
+            
+            if 0
+                bad = rm_bad_chs(values,fs,chLabels);
+                bad(~non_ekg_chs) = 1;
+                values(:,bad) = [];
+                chLabels(bad) = [];
+                chIndices(bad) = [];
+            end
 
             %% Spike detection
-            out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct);
+            if doing_test && ~isempty(test_label)
+                test_ch = strcmp(test_label,chLabels);
+                out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,test_ch);
+            else
+                out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,[]);
+            end
 
             if ~isempty(out)
 
                 %% Spikes on EKG
                 
-                ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100);
+                ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100,[]);
                 if ~isempty(ekg_spikes)
                 all_spikes = remove_ekg(out,ekg_spikes,fs);
                 end
                 
                 %% Adjust times of spikes
+                indices = out(:,1);
                 out = adjust_spike_times(out,start_time,fs);
+                
 
                 %% Re-derive original channels
-                out = rederive_original_chs(chIndices,out,chLabels,data.chLabels(:,1));
-
+                out = rederive_original_chs(chIndices,out,chLabels,new_orig_labels);
+            else
+                indices = [];
+            end
+            
+            if do_plots
+                plot_signal(orig_values,new_orig_labels,display_time,out,indices,fs,start_time,bad);
             end
 
             %% Add data to structure and save
@@ -185,7 +246,9 @@ for p = whichPts
             spikes.fs = fs;
             spikes.spikes(i).chLabels = chLabels;
             spikes.spikes(i).chLabels_orig = data.chLabels(:,1);
-            save([out_folder,fname],'spikes');
+            if do_save == 1
+                save([out_folder,fname],'spikes');
+            end
 
             %% Move to next start time
             start_time = start_time+batch_time;

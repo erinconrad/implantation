@@ -1,4 +1,4 @@
-function final_spikes = detect_spikes(eeg,tmul,absthresh,srate,min_chs,max_ch_pct,test_ch)
+function final_spikes = detect_spikes_alt(eeg,tmul,absthresh,srate,min_chs,max_ch_pct,test_ch)
 
 
 % Check function input
@@ -15,14 +15,13 @@ n_chans = size(eeg,2);
 rate   = srate;
 chan   = 1:n_chans;
 
-spkdur = 220;                % spike duration must be less than this in ms
+spkdur = 300;%220;                % spike duration must be less than this in ms
 spkdur = spkdur*rate/1000;   % convert to points;
-fr     = 40; % low pass filter for spikey component
+too_narrow = 40;
+fr     = 15; %40 % low pass filter for spikey component
 lfr    = 7;  % low pass filter for slow wave component
-aftdur = 70;
+aftdur = 150;
 aftdur   = aftdur*rate/1000;   % convert to points;
-spikedur = 30; % minimum spike duration in points
-fn_fr  = 6; % high pass filter for spikey component
 
 % Initialize things
 all_spikes  = [];
@@ -36,15 +35,15 @@ else
     chs_to_do = find(test_ch);
 end
 
-
 % Iterate channels and detect spikes
-for dd = chs_to_do     
+for dd = chs_to_do    
     
         data = eeg(:,dd);
         out = [];
         
         %% re-adjust the mean of the data to be zero (if there is a weird dc shift)
         data = data - mean(data);
+        baseline = mean(data); % should be zero
 
      %   plot(data);
         %% Run the spike detector
@@ -52,17 +51,53 @@ for dd = chs_to_do
         spikes   = [];
 
         % first look at the high frequency data for the 'spike' component
-        fndata   = eegfilt(data, fn_fr, 'hp',srate); % high pass filter
+        fndata   = eegfilt(data, 1, 'hp',srate); % high pass filter
         HFdata    = eegfilt(fndata, fr, 'lp',srate); % low pass filter
 
 
-        lthresh = mean(abs(HFdata));  % this is the smallest the initial part of the spike can be
+        lthresh = mean(abs(data));  % this is the smallest the initial part of the spike can be
         thresh  = lthresh*tmul;     % this is the final threshold we want to impose
-        sthresh = lthresh*tmul/3;   % this is the first run threshold
-
-
+        sthresh = lthresh*tmul/3;
+        
         [spp,spv] = FindPeaks(HFdata);
-
+        
+        %{
+        % Pair them
+        if length(spp) > length(spv)
+            % peak is the first one; ignore last peak
+            spp(end) = [];
+            pairs = [spp,spv];
+        else
+            % valley is the first one; ignore first valley
+            spv(1) = [];
+            pairs = [spp,spv];
+        end
+            
+        idx = find(diff(pairs(:,1)) <= spkdur | diff(pairs(:,2) <= spkdur));
+        
+        for i = 1:length(idx)-1
+            peak1 = pairs(idx(i),1);
+            peak2 = pairs(idx(i)+1,1);
+            valley1 = pairs(idx(i),2);
+            valley2 = pairs(idx(i)+1,2);
+            
+            
+            % check for big peak 2
+            if  HFdata(peak2) - HFdata(valley1) > lthresh
+                spikes(end+1,1) = peak2;
+                spikes(end,2) = peak2-peak1;
+                spikes(
+            % check for deep valley 1
+            elseif Hfdata(peak1) - HFdata(valley1) > lthresh
+                
+                
+            end
+            
+            
+        end
+        %}
+        
+        %
         idx      = find(diff(spp) <= spkdur);       % find the durations less than or equal to that of a spike
         startdx  = spp(idx);
         startdx1 = spp(idx+1);
@@ -77,6 +112,7 @@ for dd = chs_to_do
             end
 
         end
+        %}
 
 
         % now have a list of spikes that have passed the 'spike' criterion.
@@ -137,7 +173,7 @@ for dd = chs_to_do
         % now have all the info we need to decide if this thing is a spike or not.
         for i = 1:size(spikes, 1)  % for each spike
             if sum(spikes(i,[3 5])) > thresh && sum(spikes(i,[3 5])) > absthresh            % both parts together are bigger than thresh: so have some flexibility in relative sizes
-                if spikes(i,2) > spikedur     % spike wave cannot be too sharp: then it is either too small or noise
+                if spikes(i,2) > too_narrow     % spike wave cannot be too sharp: then it is either too small or noise
                     out(end+1,1) = spikes(i,1);         % add timestamp of spike to output list
                 else
                     toosharp(end+1) = spikes(i,1);
@@ -149,6 +185,7 @@ for dd = chs_to_do
 
         totalspikes(dd) =  totalspikes(dd) + length(out);  % keep track of total number of spikes so far
 
+        %{
         if ~isempty(out)
          %% Re-align spikes to peak of data
          timeToPeak = [-.1,.15]; %Only look 100 ms before and 150 ms after the currently defined peak
@@ -163,6 +200,7 @@ for dd = chs_to_do
             out(i,1) = out(i,1) + idxToPeak(1) + I;
          end
         end
+        %}
 
 
 
@@ -175,7 +213,7 @@ for dd = chs_to_do
 
        all_spikes = [all_spikes;out];
 
-    if 1== 0 && dd == 89
+    if ~isempty(test_ch)
         figure
         plot_times = 1:15*srate;
         plot(linspace(0,15,length(plot_times)),data(plot_times))
@@ -183,7 +221,8 @@ for dd = chs_to_do
         plot(linspace(0,15,length(plot_times)),HFdata(plot_times))
         hold on
         plot(linspace(0,15,length(plot_times)),fndata(plot_times))
-        error('look\n');
+        pause
+        close(gcf)
     end
        
     % if dd == 7, error('look'); end
@@ -205,9 +244,9 @@ end
 
 % sort by time
 all_spikes = sortrows(all_spikes);
-min_time = 100*rate/1000;
+min_time = 50*rate/1000;
 max_chs = round(max_ch_pct*n_chans);
-
+%final_spikes = all_spikes;
 final_spikes = min_max_length(all_spikes,min_time,min_chs,max_chs);
   
 
