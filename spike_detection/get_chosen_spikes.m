@@ -22,7 +22,7 @@ if doing_test
 else
     do_save = 1;
     do_plots = 0;
-    overwrite = 1;
+    overwrite = 0;
 end
 
 %% Spike detector parameters
