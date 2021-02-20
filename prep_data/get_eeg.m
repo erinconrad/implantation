@@ -10,7 +10,7 @@ while 1
         session = IEEGSession(dataName, loginname, pwname);
         break
     catch
-        fprintf('\nRandom server error, retrying...\n');
+        fprintf('\nRandom server error, retrying in 5 seconds...\n');
         pause(5)
     end
 end
