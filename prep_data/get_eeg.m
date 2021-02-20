@@ -11,6 +11,7 @@ while 1
         break
     catch
         fprintf('\nRandom server error, retrying...\n');
+        pause(5)
     end
 end
 fs = session.data.sampleRate;
