@@ -5,7 +5,14 @@ function data = get_eeg(dataName,pwname,times)
 
 %% Unchanging parameters
 loginname = 'erinconr';
-session = IEEGSession(dataName, loginname, pwname);
+while 1
+    try
+        session = IEEGSession(dataName, loginname, pwname);
+        break
+    catch
+        fprintf('\nRandom server error, retrying...\n');
+    end
+end
 fs = session.data.sampleRate;
 channelLabels = session.data.channelLabels;
 
