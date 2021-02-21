@@ -8,26 +8,27 @@ loginname = 'erinconr';
 while 1
     try
         session = IEEGSession(dataName, loginname, pwname);
+        fs = session.data.sampleRate;
+        channelLabels = session.data.channelLabels;
+
+        start_index = max(1,round(times(1)*fs));
+        end_index = round(times(2)*fs); 
+
+        %values = session.data.getvalues([start_index:end_index],':');
+
+        % Break the number of channels in half to avoid wacky server errors
+
+        nchs = size(channelLabels,1);
+        %error('look');
+        values1 = session.data.getvalues([start_index:end_index],1:floor(nchs/2));
+        values2 = session.data.getvalues([start_index:end_index],floor(nchs/2)+1:nchs);
         break
     catch
         fprintf('\nRandom server error, retrying in 5 seconds...\n');
         pause(5)
     end
 end
-fs = session.data.sampleRate;
-channelLabels = session.data.channelLabels;
 
-start_index = max(1,round(times(1)*fs));
-end_index = round(times(2)*fs); 
-
-%values = session.data.getvalues([start_index:end_index],':');
-
-% Break the number of channels in half to avoid wacky server errors
-
-nchs = size(channelLabels,1);
-%error('look');
-values1 = session.data.getvalues([start_index:end_index],1:floor(nchs/2));
-values2 = session.data.getvalues([start_index:end_index],floor(nchs/2)+1:nchs);
 values = [values1,values2];
 %}
 
