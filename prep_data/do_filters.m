@@ -1,5 +1,6 @@
 function values = do_filters(values,fs,chLabels)
 
+%
 %% Bipolar montage
 for ch = 1:size(values,2)
     % Initialize it as nans
@@ -26,6 +27,7 @@ for ch = 1:size(values,2)
     end
     values(:,ch) = out;
 end
+%}
 
 %% Notch filter
 f = designfilt('bandstopiir','FilterOrder',2, ...

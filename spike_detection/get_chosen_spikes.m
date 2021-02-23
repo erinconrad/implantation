@@ -184,8 +184,8 @@ for p = whichPts
             
             orig_values = values;
             non_ekg_chs = get_non_ekg_chs(chLabels);
-            bad = zeros(length(chLabels),1);
-            if 1
+            %bad = zeros(length(chLabels),1);
+            if 0
                 values(:,~non_ekg_chs) = [];
                 chLabels(~non_ekg_chs) = [];
                 chIndices(~non_ekg_chs) = [];
@@ -199,7 +199,7 @@ for p = whichPts
             
             %% Remove artifact heavy channels
             
-            if 0
+            if 1
                 bad = rm_bad_chs(values,fs,chLabels);
                 bad(~non_ekg_chs) = 1;
                 values(:,bad) = [];
@@ -222,6 +222,7 @@ for p = whichPts
                 ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100,[]);
                 if ~isempty(ekg_spikes)
                 all_spikes = remove_ekg(out,ekg_spikes,fs);
+                out = all_spikes;
                 end
                 
                 %% Adjust times of spikes
