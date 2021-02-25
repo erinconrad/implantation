@@ -29,6 +29,7 @@ for ch = 1:size(values,2)
 end
 %}
 
+%
 %% Notch filter
 f = designfilt('bandstopiir','FilterOrder',2, ...
    'HalfPowerFrequency1',59,'HalfPowerFrequency2',61, ...
@@ -52,6 +53,7 @@ for i = 1:size(values,2)
    % pause
    % hold off
 end
+%}
 
 %% Common average reference
 %values = values - mean(values,2);

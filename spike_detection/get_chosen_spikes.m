@@ -21,7 +21,7 @@ if doing_test
     overwrite = 1;
 else
     do_save = 1;
-    do_plots = 0;
+    do_plots = 1;
     overwrite = 0;
 end
 
