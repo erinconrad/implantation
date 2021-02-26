@@ -9,7 +9,8 @@ for i = 1:length(chLabels)
     end
     
     % remove RR channels too
-    if contains(curr_label,'rate') || contains(curr_label,'rr') || contains(curr_label,'RR')
+    if contains(curr_label,'rate') || contains(curr_label,'Rate')...
+            contains(curr_label,'rr') || contains(curr_label,'RR')
         non_ekg_chs(i) = 0;
     end
 end
