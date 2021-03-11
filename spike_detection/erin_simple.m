@@ -1,8 +1,9 @@
 function gdf=erin_simple(values,fs)
 
 
-tmul = 8;
+tmul =15;
 width = [20 200]*1e-3;
+lpf = 0.5;
 
 
 width_idx = width*fs;
@@ -20,22 +21,25 @@ for ich = 1:nchs
     bl = median(eeg);
     eeg = eeg-bl; % remove baseline
     
-    % get dev
-    bl_dev = std(eeg);
-    thresh = (bl_dev*tmul);
+    
     
     % low pass filter the signal (for the purpose of finding peaks)
-    lp = lowpass(eeg,1,fs);
+    lp = lowpass(eeg,lpf,fs);
+    lpp = lp.^2;
+    
+    % get dev
+    bl_dev = std(lpp);
+    thresh = (bl_dev)*tmul;
     
     % Find peaks
-    [p,t]=FindPeaks(lp);
+    [p,t]=FindPeaks(lpp);
     all_p = [p;t];
     all_p = [1;all_p;nsamples];
     [all_p] = sort(all_p);
 
     
     % Look for peaks that exceed an amplitude threshold
-    big_p = find(abs(eeg(all_p)) > thresh);
+    big_p = find((lpp(all_p)) > thresh);
     
     keep = zeros(length(big_p),1);
     
@@ -64,7 +68,7 @@ for ich = 1:nchs
     % If 2 adjacent ones, pick the bigger one
     for i = 1:length(big_p)-1
         if big_p(i+1) == big_p(i) + 1
-            if all_p(big_p(i+1))>all_p(big_p(i))
+            if lpp(all_p(big_p(i+1)))>lpp(all_p(big_p(i)))
                 new_keep(i) = 0;
             else
                 new_keep(i+1) = 0;
@@ -77,11 +81,11 @@ for ich = 1:nchs
     
     if 0
         figure
-        plot(eeg,'b');
+        plot(lpp,'b');
         hold on
-        plot(xlim,[bl bl],'k');
-        plot(xlim,[bl+thresh bl+thresh],'k--');
-        plot(xlim,[bl-thresh bl-thresh],'k--');
+        plot(xlim,[median(lpp) median(lpp)],'k');
+        plot(xlim,[median(lpp)+thresh median(lpp)+thresh],'k--');
+        plot(xlim,[median(lpp)-thresh median(lpp)-thresh],'k--');
         
         for i = 1:length(spikes)
             plot(spikes(i),eeg(spikes(i)),'o');

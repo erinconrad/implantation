@@ -1,12 +1,24 @@
+%{
+I can improve this code by:
+1. using the eeg data that exists on my computer, so it goes faster
+2. automate the process! call it a FN if it fails to detect a spike within
+200 ms of the middle, and a FP if it detects other spikes!!! I can output
+this info, with the corresponding spike numbers for each patient. 
+
+I think this would be a very handy way to rapidly test many spike detectors
+
+%}
+
+
 clear
 
 %% Parameters
 detector = 'erin';
 pt_name = 'HUP075';
-which_spikes = 1:10;
+which_spikes = [];
 surround_time = 3; % how many s before and after
 which_chs = [];%{'AMY1','AMY2'};
-show_bad = 1;
+show_bad = 0;
 
 
 %% Locations
@@ -40,6 +52,10 @@ ieeg_name = pt(p).ieeg_name;
 %% Load spike time file
 T = readtable(spike_file);
 spike_times = T.(pt_name);
+
+if isempty(which_spikes)
+    which_spikes = 1:length(spike_times);
+end
 
 %% Get eeg data for spike
 for s = which_spikes
@@ -82,7 +98,7 @@ for s = which_spikes
         gdf = fspk2(values,tmul,absthresh,n_chans,fs);
         
         case 'wavelet'
-        wavelet_detector(values,fs);
+        gdf = wavelet_detector(values,fs);
         
         case 'erin'
         gdf = erin_simple(values,fs);
