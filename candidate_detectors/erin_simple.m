@@ -1,7 +1,5 @@
-function gdf=erin_simple(values,fs)
+function gdf=erin_simple(values,fs,tmul)
 
-
-tmul =15;
 width = [20 200]*1e-3;
 lpf = 0.5;
 

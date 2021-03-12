@@ -2,13 +2,30 @@
 
 function test_new_detectors(detector)
 
-%% Parameters
+%% General parameters
 overwrite = 0;
 pt_name = [];
 do_plot = 0;
 do_save = 1;
 allowable_time_from_zero = 0.1; % 100 ms
 rm_bad = 0;
+
+
+%% Detector specific parameters
+switch detector
+    case 'fspk2'
+    tmul = 13;
+    absthresh = 300;
+
+    case 'wavelet'
+    tmul = 20;
+    absthresh = [];
+
+    case 'erin'
+    tmul = 13;
+    absthresh = [];
+
+end
 
 %% Locations
 locations = implant_files;
@@ -70,6 +87,8 @@ for i = 1:length(which_pts)
             test.fs = fs;
             test.chLabels = spike(1).chLabels;
             last_spike = 0;
+            test.tmul = tmul;
+            test.absthresh = absthresh;
         end
     end
     
@@ -79,9 +98,6 @@ for i = 1:length(which_pts)
         continue;
     end
     
-    test.name = name;
-    test.fs = fs;
-    test.chLabels = spike(1).chLabels;
 
     %% Start getting data
     % Loop through spikes
@@ -115,17 +131,13 @@ for i = 1:length(which_pts)
         %% Spike detection
         switch detector
             case 'fspk2'
-            % FSPK2
-            tmul = 15;
-            absthresh = 300;
-            n_chans = size(values,2);
-            gdf = fspk2(values,tmul,absthresh,n_chans,fs);
+            gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
 
             case 'wavelet'
-            gdf = wavelet_detector(values,fs);
+            gdf = wavelet_detector(values,fs,tmul);
 
             case 'erin'
-            gdf = erin_simple(values,fs);
+            gdf = erin_simple(values,fs,tmul);
 
         end
 
@@ -163,7 +175,7 @@ for i = 1:length(which_pts)
             end
         end
         
-  
+            
         test.spike(s).false_negative = false_negative;
         test.spike(s).false_positive = false_positive;
         test.spike(s).n_false_positive = n_false_positive;
@@ -176,5 +188,8 @@ for i = 1:length(which_pts)
         
     end
 end
+
+%% Display the performance
+assess_detector_performance(detector,test.tmul,test.absthresh)
 
 end

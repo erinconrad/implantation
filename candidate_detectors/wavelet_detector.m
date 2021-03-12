@@ -1,7 +1,6 @@
-function gdf = wavelet_detector(values,fs)
+function gdf = wavelet_detector(values,fs,tmul)
 
 fb = [10 150];
-tmul = 20;
 width_idx = [250 500];
 
 nchs = size(values,2);
