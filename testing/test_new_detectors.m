@@ -174,6 +174,20 @@ for i = 1:length(which_pts)
 end
 
 %% Display the performance
-assess_detector_performance(detector,test.tmul,test.absthresh)
+out = assess_detector_performance(detector,test.tmul,test.absthresh);
+
+%% Output performance to a summary file
+
+% Create it if it doesn't exist
+if exist([results_folder,'testing/summary.csv'],'file') == 0
+    fid = fopen([results_folder,'testing/summary.csv'],'a');
+    fprintf(fid,'Detector,tmul,absthresh,FalseNegative,FalsePositive');
+else
+    fid = fopen([results_folder,'testing/summary.csv'],'a');
+end
+
+% Add a line with the current performance
+fprintf(fid,detector,test.tmul,test.absthresh,out.fn,out.fp);
+fclose(fid);
 
 end

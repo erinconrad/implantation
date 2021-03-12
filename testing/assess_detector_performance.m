@@ -1,4 +1,4 @@
-function assess_detector_performance(detector,tmul,absthresh)
+function out = assess_detector_performance(detector,tmul,absthresh)
 
 %% Locations
 locations = implant_files;
@@ -51,5 +51,11 @@ fprintf('\nThe rate of false positives was M = %1.1f%% (range %1.1f%%-%1.1f%%)\n
 fprintf('\nThe rate of false negatives was M = %1.1f%% (range %1.1f%%-%1.1f%%)\n',...
     mean(summary(:,2)./summary(:,1))*100,...
     min(summary(:,2)./summary(:,1))*100,max(summary(:,2)./summary(:,1))*100);
+
+mean_fp = mean(summary(:,3)./summary(:,1))*100;
+mean_fn = mean(summary(:,2)./summary(:,1))*100;
+
+out.fp = mean_fp;
+out.fn = mean_fn;
 
 end
