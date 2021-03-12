@@ -3,7 +3,7 @@
 function test_new_detectors(detector,tmul,absthresh)
 
 %% General parameters
-overwrite = 0;
+overwrite = 1;
 pt_name = [];
 do_plot = 0;
 do_save = 1;
@@ -74,6 +74,13 @@ for i = 1:length(which_pts)
             test.tmul = tmul;
             test.absthresh = absthresh;
         end
+    else
+        test.name = name;
+        test.fs = fs;
+        test.chLabels = spike(1).chLabels;
+        last_spike = 0;
+        test.tmul = tmul;
+        test.absthresh = absthresh;
     end
     
     % Are we done already?
