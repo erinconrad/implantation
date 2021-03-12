@@ -1,6 +1,6 @@
 
 
-function test_new_detectors(detector)
+function test_new_detectors(detector,tmul,absthresh)
 
 %% General parameters
 overwrite = 0;
@@ -10,22 +10,6 @@ do_save = 1;
 allowable_time_from_zero = 0.1; % 100 ms
 rm_bad = 0;
 
-
-%% Detector specific parameters
-switch detector
-    case 'fspk2'
-    tmul = 13;
-    absthresh = 300;
-
-    case 'wavelet'
-    tmul = 20;
-    absthresh = [];
-
-    case 'erin'
-    tmul = 13;
-    absthresh = [];
-
-end
 
 %% Locations
 locations = implant_files;
