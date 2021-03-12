@@ -41,7 +41,7 @@ end
 if ~isempty(pt_name)
     which_pts = find(strcmp(pt_name,pt_names));
 else
-    which_pts = 1:length(listing);
+    which_pts = 1:length(pt_names);
 end
 
 t = 0;
