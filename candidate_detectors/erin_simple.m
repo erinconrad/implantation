@@ -24,7 +24,7 @@ for ich = 1:nchs
     
     
     % low pass filter the signal (for the purpose of finding peaks)
-    lp = lowpass(eeg,lpf,fs);
+    lp = eegfilt(eeg, lpf, 'lp',fs);%lowpass(eeg,lpf,fs);
     lpp = lp.^2;
     
     % get dev
