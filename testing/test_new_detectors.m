@@ -1,27 +1,15 @@
 
 
-%{
-I can improve this code by:
-1. using the eeg data that exists on my computer, so it goes faster
-2. automate the process! call it a FN if it fails to detect a spike within
-200 ms of the middle, and a FP if it detects other spikes!!! I can output
-this info, with the corresponding spike numbers for each patient. 
-
-I think this would be a very handy way to rapidly test many spike detectors
-
-%}
-
-
 clear
 
 %% Parameters
+overwrite = 0;
 detector = 'erin';
 pt_name = 'HUP075';
-which_spikes = [];
 do_plot = 0;
 do_save = 1;
 allowable_time_from_zero = 0.1; % 100 ms
-
+rm_bad = 0;
 
 %% Locations
 locations = implant_files;
@@ -70,20 +58,37 @@ for i = 1:length(which_pts)
     spike = spike.spike;
     fs = spike(1).fs;
     
-    %% Get correct spikes
-    if isempty(which_spikes)
-        which_spikes = 1:length(spike);
+    %% See if the output file exists already
+    if overwrite == 0
+        if exist([out_folder,name,'_test.mat'],'file') ~= 0
+            % Load the file
+            test = load([out_folder,name,'_test.mat']);
+            test = test.test;
+            last_spike = length(test.spike);
+        else
+            test.name = name;
+            test.fs = fs;
+            test.chLabels = spike(1).chLabels;
+            last_spike = 0;
+        end
+    end
+    
+    % Are we done already?
+    if last_spike + 1 == length(spike)
+        fprintf('\nAlready completed %s.',name);
+        continue;
     end
     
     test.name = name;
     test.fs = fs;
     test.chLabels = spike(1).chLabels;
 
+    %% Start getting data
     % Loop through spikes
-    for j = 1:length(which_spikes)
+    for j = last_spike+1:length(spike)
         tic
-        fprintf('Doing spike %d of %d (last took %1.1fs)\n',j,length(which_spikes),t);
-        s = which_spikes(j);
+        fprintf('Doing spike %d of %d (last took %1.1fs)\n',j,length(spike),t);
+        s = j;
         
         test.spike(s).times = spike(s).times;
         
@@ -100,10 +105,12 @@ for i = 1:length(which_pts)
 
 
         %% remove bad channels
-        bad = rm_bad_chs(values,fs,chLabels);
-        values(:,bad) = [];
-        chLabels(bad) = [];
-        chIndices(bad) = [];
+        if rm_bad
+            bad = rm_bad_chs(values,fs,chLabels);
+            values(:,bad) = [];
+            chLabels(bad) = [];
+            chIndices(bad) = [];
+        end
 
         %% Spike detection
         switch detector
@@ -123,9 +130,8 @@ for i = 1:length(which_pts)
         end
 
         %% Plotting
-        spikes = gdf;
         if do_plot
-            easy_plot(values,chLabels,[0 duration],[],spikes,orig_values,orig_labels,1)
+            easy_plot(values,chLabels,[0 duration],[],gdf,orig_values,orig_labels,1)
             pause
             close(gcf)
         end
@@ -137,28 +143,30 @@ for i = 1:length(which_pts)
         false_negative = 0;
         false_positive = 0;
         
-        if isempty(spikes)
+        if isempty(gdf)
             % false negative if no spike
             false_negative = 1;
         else    
             mid_file = size(values,1)/2; % middle index
-            diff_from_zero = spikes(:,2) - mid_file;
+            diff_from_zero = gdf(:,2) - mid_file;
             time_from_zero = diff_from_zero/fs; % convert index to time
             outside_allowable_time = abs(time_from_zero) > allowable_time_from_zero;
             n_false_positive = sum(outside_allowable_time);
             if n_false_positive > 0
                 false_positive = 1;
             end
-            if n_false_positive == length(spikes)
+            if n_false_positive == length(gdf)
                 % also false negative if all spikes detected were false
                 % positive
                 false_negative = 1;
             end
         end
-            
+        
+  
         test.spike(s).false_negative = false_negative;
         test.spike(s).false_positive = false_positive;
         test.spike(s).n_false_positive = n_false_positive;
+        test.spike(s).gdf = gdf;
         
         if do_save
             save([out_folder,name,'_test.mat'],'test')
