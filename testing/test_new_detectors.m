@@ -4,7 +4,6 @@ function test_new_detectors(detector)
 
 %% Parameters
 overwrite = 0;
-detector = 'erin';
 pt_name = [];
 do_plot = 0;
 do_save = 1;
