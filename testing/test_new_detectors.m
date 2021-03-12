@@ -5,7 +5,7 @@ clear
 %% Parameters
 overwrite = 0;
 detector = 'erin';
-pt_name = 'HUP075';
+pt_name = [];
 do_plot = 0;
 do_save = 1;
 allowable_time_from_zero = 0.1; % 100 ms
@@ -29,12 +29,13 @@ pt = load([pt_folder,'pt.mat']);
 pt = pt.pt;
 eeg_data_folder = [locations.main_folder,'../spike_networks/results/eeg_data/'];
 listing = dir([eeg_data_folder,'*.mat']);
-pt_names = cell(length(listing),1);
+pt_names = {};
 for i = 1:length(listing)
     fname = listing(i).name;
+    if contains(fname,'not'), continue; end
     C = strsplit(fname,'_');
     curr_pt_name = C{1};
-    pt_names{i} = curr_pt_name;
+    pt_names = [pt_names;curr_pt_name];
 end
 
 %% Get the correct pts
@@ -146,6 +147,7 @@ for i = 1:length(which_pts)
         if isempty(gdf)
             % false negative if no spike
             false_negative = 1;
+            n_false_positive = 0;
         else    
             mid_file = size(values,1)/2; % middle index
             diff_from_zero = gdf(:,2) - mid_file;
