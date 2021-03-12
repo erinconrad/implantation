@@ -33,7 +33,7 @@ for ich = 1:nchs
     sig_freq = sum(abs(cfs(f>=fb(1) & f<=fb(2),:)),1);
     
     % low pass filter (to find peaks)
-    lp = eegfilt(sig_freq,1,fs);%lowpass(sig_freq,1,fs);
+    lp = eegfilt(sig_freq,1,'lp',fs);%lowpass(sig_freq,1,fs);
     lp = lp';
     
     % Find peaks
