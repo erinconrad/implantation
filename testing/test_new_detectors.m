@@ -1,6 +1,6 @@
 
 
-clear
+function test_new_detectors(detector)
 
 %% Parameters
 overwrite = 0;
@@ -176,4 +176,6 @@ for i = 1:length(which_pts)
         
         
     end
+end
+
 end
