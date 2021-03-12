@@ -194,7 +194,7 @@ else
 end
 
 % Add a line with the current performance
-fprintf(fid,'%s,%1.1f,%1.1f,%1.1f,%1.1f',detector,test.tmul,test.absthresh,out.fn,out.fp);
+fprintf(fid,'\n%s,%1.1f,%1.1f,%1.1f,%1.1f',detector,test.tmul,test.absthresh,out.fn,out.fp);
 fclose(fid);
 
 end
