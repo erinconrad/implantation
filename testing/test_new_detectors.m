@@ -1,9 +1,8 @@
 
 
-function test_new_detectors(detector,tmul,absthresh)
+function test_new_detectors(detector,overwrite,tmul,absthresh)
 
 %% General parameters
-overwrite = 1;
 pt_name = [];
 do_plot = 0;
 do_save = 1;
@@ -66,6 +65,14 @@ for i = 1:length(which_pts)
             test = load([out_folder,name,'_test.mat']);
             test = test.test;
             last_spike = length(test.spike);
+            
+            % take tmul and absthresh that were used before (overriding
+            % whatever I wrote in the command!). I think this is a good
+            % idea because it is more important to have consistency across
+            % the run, particularly if I might mistakenly enter a different
+            % tmul from what I had before
+            tmul = test.tmul;
+            absthresh = test.absthresh;
         else
             test.name = name;
             test.fs = fs;
