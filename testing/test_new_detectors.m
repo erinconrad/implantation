@@ -3,9 +3,11 @@
 function test_new_detectors(detector,overwrite,tmul,absthresh)
 
 %% General parameters
-pt_name = [];
 do_plot = 0;
 do_save = 1;
+
+pt_name = [];
+
 allowable_time_from_zero = 0.1; % 100 ms
 rm_bad = 0;
 
@@ -127,10 +129,17 @@ for i = 1:length(which_pts)
         end
 
         %% Spike detection
+        if isempty(absthresh) && contains(detector,'fspk')
+            error('You must supply absthresh'); 
+        
+        end
         switch detector
             case 'fspk2'
             gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
-
+            
+            case 'fspk3'
+            gdf = fspk3(values,tmul,absthresh,size(values,2),fs);
+                
             case 'wavelet'
             gdf = wavelet_detector(values,fs,tmul);
 
@@ -138,6 +147,16 @@ for i = 1:length(which_pts)
             gdf = erin_simple(values,fs,tmul);
 
         end
+        
+        %% Post-detector checks
+        if ~isempty(gdf)
+            gdf = sortrows(gdf,2);
+            min_time = 50/1000*fs;
+            max_chs = round(0.6*size(values,2));
+            min_chs = 2;
+            gdf = min_max_length(gdf,min_time,min_chs,max_chs);
+        end
+        
 
         %% Plotting
         if do_plot

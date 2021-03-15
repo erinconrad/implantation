@@ -4,10 +4,10 @@ final_spikes = [];
 
 s = 1;
 curr_seq = s;
-last_time = all_spikes(s,1);
+last_time = all_spikes(s,2);
 
 while s<size(all_spikes,1)
-    new_time = all_spikes(s+1,1);
+    new_time = all_spikes(s+1,2);
     
     if new_time - last_time < min_time
         curr_seq = [curr_seq;s+1]; % append it to the current sequence
@@ -24,7 +24,7 @@ while s<size(all_spikes,1)
     end
     
     % increase the last time
-    last_time = all_spikes(s+1,1);
+    last_time = all_spikes(s+1,2);
     
     % increase the current spike
     s = s+1;

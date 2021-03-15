@@ -1,7 +1,7 @@
 function gdf=erin_simple(values,fs,tmul)
 
 width = [20 200]*1e-3;
-lpf = 0.5;
+lpf = 20;
 
 
 width_idx = width*fs;
@@ -20,9 +20,8 @@ for ich = 1:nchs
     eeg = eeg-bl; % remove baseline
     
     
-    
     % low pass filter the signal (for the purpose of finding peaks)
-    lp = eegfilt(eeg, lpf, 'lp',fs);%lowpass(eeg,lpf,fs);
+    lp = eegfilt(eeg, lpf, 'lp',fs);
     lpp = lp.^2;
     
     % get dev
@@ -44,7 +43,7 @@ for ich = 1:nchs
     % Loop through big peaks
     for i = 1:length(big_p)
         
-        if big_p(i) == 1 || big_p(i) == nsamples
+        if big_p(i) == 1 || big_p(i) == length(all_p)
             continue;
         end
         
