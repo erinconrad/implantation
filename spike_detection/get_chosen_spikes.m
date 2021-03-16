@@ -125,6 +125,7 @@ for p = whichPts
 
         
         while start_time < end_time
+            tic
             if ~doing_test
                 fprintf('\nDoing %1.1f of %1.1f s of %d of %d\n',start_time-spikes.spikes(i).times(1),...
                     spikes.spikes(i).times(2)-spikes.spikes(i).times(1),i,n_times);
@@ -269,7 +270,8 @@ for p = whichPts
 
             %% Move to next start time
             start_time = start_time+batch_time;
-
+            t = toc;
+            fprintf('Finished in %d seconds\n.',t);
             
         end
     end

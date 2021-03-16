@@ -21,6 +21,20 @@ spike_folder = [results_folder,'spikes/'];
 pt = load([data_folder,'pt_w_elecs.mat']);
 pt = pt.pt;
 
+if isempty(all_p)
+    listing = dir([spike_folder,'*.mat']);
+    for i = 1:length(listing)
+        temp_name = listing(i).name;
+        for j = 1:length(pt)
+            pt_name = pt(j).name;
+            if strcmp(temp_name,pt_name)
+                all_p = [all_p;j];
+                break
+            end
+        end
+    end
+end
+
 for p = all_p
     pt_name = pt(p).name;
     out_folder = [results_folder,'validation/',pt_name,'/'];
