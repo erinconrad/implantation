@@ -14,7 +14,6 @@ rm_bad = 0;
 
 %% Locations
 locations = implant_files;
-pwname = locations.pwfile;
 scripts_folder = [locations.script_folder];
 results_folder = [locations.main_folder,'results/'];
 addpath(genpath(scripts_folder));
@@ -25,9 +24,6 @@ end
 
 %% Get data
 % Note that these are pts from spike_networks project
-pt_folder = [locations.main_folder,'../spike_networks/data/spike_structures/'];
-pt = load([pt_folder,'pt.mat']);
-pt = pt.pt;
 eeg_data_folder = [locations.main_folder,'../spike_networks/results/eeg_data/'];
 listing = dir([eeg_data_folder,'*.mat']);
 pt_names = {};

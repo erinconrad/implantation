@@ -16,8 +16,8 @@ STILL NEED TO GET SEIZURE TIMES
 %}
 
 %% Parameters
-n_chunks = 50; % how many pre-reimplant and post-reimplant chunks?
-chunk_duration = 1800; % how long should each chunk be?
+n_chunks = 150; % how many pre-reimplant and post-reimplant chunks?
+chunk_duration = 600; % how long should each chunk be?
 dead_time = 1e4; % ignore the first 10,000 seconds at the start and end of each file
 min_distance = 1800; % this is how far away different chunks should be from each other and from events
 

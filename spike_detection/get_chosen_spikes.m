@@ -5,7 +5,7 @@ function get_chosen_spikes(whichPts)
 %running through 9
 
 %% General parameters
-doing_test = 0;
+doing_test = 1;
 %whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
 add_clean_times = 0;
 batch_time = 60;
