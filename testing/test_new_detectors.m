@@ -3,8 +3,8 @@
 function test_new_detectors(detector,overwrite,tmul,absthresh)
 
 %% General parameters
-do_plot = 0;
-do_save = 1;
+do_plot = 1;
+do_save = 0;
 
 pt_name = [];
 

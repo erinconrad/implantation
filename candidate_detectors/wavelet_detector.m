@@ -1,6 +1,6 @@
 function gdf = wavelet_detector(values,fs,tmul)
 
-fb = [10 150];
+fb = [10 50];
 width_idx = [250 500];
 
 nchs = size(values,2);
@@ -23,7 +23,7 @@ for ich = 1:nchs
     
     [cfs,f] = cwt(eeg,fs);
     
-    if 1
+    if 0
     figure
     imagesc(tm,f,abs(cfs));
     end

@@ -89,6 +89,8 @@ for p = whichPts
             spikes.times = all_times;
             spikes.time_index = 1;
             spikes.server_error_times = [];
+            spikes.tmul = tmul;
+            spikes.absthresh = absthresh;
         end
     else
         spikes.name = pt_name;
@@ -224,8 +226,9 @@ for p = whichPts
             end
             max_chs = round(max_ch_pct/100*size(values,2));
             min_idx = min_time*fs;
-            gdf = min_max_length(gdf,min_idx,min_chs,max_chs);
+            
             if ~isempty(gdf)
+                gdf = min_max_length(gdf,min_idx,min_chs,max_chs);
                 out = [gdf(:,2),gdf(:,1)];
             else
                 out = gdf;
@@ -271,7 +274,7 @@ for p = whichPts
             %% Move to next start time
             start_time = start_time+batch_time;
             t = toc;
-            fprintf('Finished in %d seconds\n.',t);
+            fprintf('Finished in %1.1f seconds\n.',t);
             
         end
     end
