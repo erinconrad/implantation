@@ -277,7 +277,7 @@ for p = whichPts
             %% Move to next start time
             start_time = start_time+batch_time;
             t = toc;
-            fprintf('Finished in %1.1f seconds\n.',t);
+            fprintf('Finished in %1.1f seconds. Detected %d spikes.\n',t,size(out,1));
             
         end
     end
