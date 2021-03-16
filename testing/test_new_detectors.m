@@ -145,12 +145,14 @@ for i = 1:length(which_pts)
         end
         
         %% Post-detector checks
+        if 0
         if ~isempty(gdf)
             gdf = sortrows(gdf,2);
             min_time = 50/1000*fs;
             max_chs = round(0.6*size(values,2));
             min_chs = 2;
             gdf = min_max_length(gdf,min_time,min_chs,max_chs);
+        end
         end
         
 
