@@ -24,7 +24,9 @@ pt = pt.pt;
 if isempty(all_p)
     listing = dir([spike_folder,'*.mat']);
     for i = 1:length(listing)
-        temp_name = listing(i).name;
+        C = listing(i).name;
+        temp_name = strsplit(C,'_');
+        temp_name = temp_name{1};
         for j = 1:length(pt)
             pt_name = pt(j).name;
             if strcmp(temp_name,pt_name)
