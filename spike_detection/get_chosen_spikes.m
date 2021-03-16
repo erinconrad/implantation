@@ -1,6 +1,6 @@
 
 
-function get_chosen_spikes(whichPts,tmul)
+function get_chosen_spikes(whichPts,tmul,overwrite)
 
 %running through 9
 
@@ -22,7 +22,6 @@ if doing_test
 else
     do_save = 1;
     do_plots = 0;
-    overwrite = 0;
 end
 
 %% Spike detector parameters
