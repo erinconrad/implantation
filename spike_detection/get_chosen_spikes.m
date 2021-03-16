@@ -5,7 +5,7 @@ function get_chosen_spikes(whichPts)
 %running through 9
 
 %% General parameters
-doing_test = 1;
+doing_test = 0;
 %whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
 add_clean_times = 0;
 batch_time = 60;
@@ -21,7 +21,7 @@ if doing_test
     overwrite = 1;
 else
     do_save = 1;
-    do_plots = 1;
+    do_plots = 0;
     overwrite = 0;
 end
 
@@ -30,6 +30,7 @@ tmul = 19;
 absthresh = 300;
 min_chs = 3; % min number of channels
 max_ch_pct = 50; % if spike > 50% of channels, throw away
+min_time = 50/1000;
 
 display_time = 60;
 
@@ -48,6 +49,10 @@ pt = pt.pt;
 
 if exist(out_folder,'dir') == 0
     mkdir(out_folder)
+end
+
+if isempty(whichPts)
+    whichPts = [10 1 3 5 6 8 9 11];
 end
 
 for p = whichPts
@@ -210,19 +215,30 @@ for p = whichPts
             %% Spike detection
             if doing_test && ~isempty(test_label)
                 test_ch = strcmp(test_label,chLabels);
-                out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,test_ch);
+                gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
+                %out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,test_ch);
             else
-                out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,[]);
+                gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
+                %out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,[]);
+            end
+            max_chs = round(max_ch_pct/100*size(values,2));
+            min_idx = min_time*fs;
+            gdf = min_max_length(gdf,min_idx,min_chs,max_chs);
+            if ~isempty(gdf)
+                out = [gdf(:,2),gdf(:,1)];
+            else
+                out = gdf;
             end
 
             if ~isempty(out)
 
                 %% Spikes on EKG
-                
-                ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100,[]);
-                if ~isempty(ekg_spikes)
-                all_spikes = remove_ekg(out,ekg_spikes,fs);
-                out = all_spikes;
+                if 0
+                    ekg_spikes = detect_spikes(orig_values(:,~non_ekg_chs),tmul,absthresh,fs,0,100,[]);
+                    if ~isempty(ekg_spikes)
+                    all_spikes = remove_ekg(out,ekg_spikes,fs);
+                    out = all_spikes;
+                    end
                 end
                 
                 %% Adjust times of spikes
