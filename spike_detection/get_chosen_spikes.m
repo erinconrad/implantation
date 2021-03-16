@@ -228,8 +228,10 @@ for p = whichPts
             min_idx = min_time*fs;
             
             if ~isempty(gdf)
-                error('look');
                 gdf = min_max_length(gdf,min_idx,min_chs,max_chs);
+            end
+            
+            if ~isempty(gdf)
                 out = [gdf(:,2),gdf(:,1)];
             else
                 out = gdf;
