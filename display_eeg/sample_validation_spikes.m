@@ -30,7 +30,7 @@ if isempty(all_p)
         for j = 1:length(pt)
             pt_name = pt(j).name;
             if strcmp(temp_name,pt_name)
-                all_p = [all_p;j];
+                all_p = [all_p,j];
                 break
             end
         end
