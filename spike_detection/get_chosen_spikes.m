@@ -1,6 +1,6 @@
 
 
-function get_chosen_spikes(whichPts,tmul,min_ch_check,overwrite)
+function get_chosen_spikes(whichPts,tmul,overwrite)
 
 %running through 9
 
@@ -89,7 +89,6 @@ for p = whichPts
             spikes.server_error_times = [];
             spikes.tmul = tmul;
             spikes.absthresh = absthresh;
-            spikes.min_ch_check = min_ch_check;
         end
     else
         spikes.name = pt_name;
@@ -98,7 +97,6 @@ for p = whichPts
         spikes.server_error_times = [];
         spikes.tmul = tmul;
         spikes.absthresh = absthresh;
-        spikes.min_ch_check = min_ch_check;
     end
     
     if isfield(spikes,'spikes') == 0
