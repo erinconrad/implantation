@@ -2,8 +2,8 @@ function sample_validation_spikes(all_p)
 
 %% General parameters
 
-n_sp_plot = 50;
-n_per_fig = 10;
+n_sp_plot = 5;
+n_per_fig = 5;
 surround = 7.5;
 
 
