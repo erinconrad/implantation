@@ -17,12 +17,12 @@ chan   = 1:n_chans;
 
 spkdur = 220;                % spike duration must be less than this in ms
 spkdur = spkdur*rate/1000;   % convert to points;
-fr     = 20; % low pass filter for spikey component
+fr     = 40; % low pass filter for spikey component
 lfr    = 7;  % low pass filter for slow wave component
-aftdur = 150;
+aftdur = 70;
 aftdur   = aftdur*rate/1000;   % convert to points;
-spikedur = 20; % minimum spike duration in points
-fn_fr  = 7; % high pass filter for spikey component
+spikedur = 5; % minimum spike duration in points
+fn_fr  = 10; % high pass filter for spikey component
 
 % Initialize things
 all_spikes  = [];
@@ -70,7 +70,7 @@ for dd = chs_to_do
         % check the amplitude of the waves of appropriate duration
         for i = 1:length(startdx)
             spkmintic = spv((spv > startdx(i) & spv < startdx1(i))); % find the valley that is between the two peaks
-            if abs(HFdata(startdx1(i)) - HFdata(spkmintic)) > sthresh && HFdata(startdx(i)) - HFdata(spkmintic) > lthresh   % see if the peaks are big enough
+            if abs(HFdata(startdx1(i)) - HFdata(spkmintic)) > sthresh % && HFdata(startdx(i)) - HFdata(spkmintic) > lthresh   % see if the peaks are big enough
                 spikes(end+1,1) = spkmintic;                                  % add timestamp to the spike list
                 spikes(end,2)   = (startdx1(i)-startdx(i))*1000/rate;         % add spike duration to list
                 spikes(end,3)   = abs(HFdata(startdx1(i)) - HFdata(spkmintic));    % add spike amplitude to list
