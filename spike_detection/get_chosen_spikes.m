@@ -209,6 +209,7 @@ for p = whichPts
             
             if 1
                 bad = rm_bad_chs(values,fs,chLabels);
+                fprintf('\nDesignated %d of %d channels as bad.\n',sum(bad),length(bad));
                 bad(~non_ekg_chs) = 1;
                 values(:,bad) = [];
                 chLabels(bad) = [];
