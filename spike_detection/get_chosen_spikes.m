@@ -26,7 +26,7 @@ end
 
 %% Spike detector parameters
 absthresh = 300;
-min_chs = 3; % min number of channels
+min_chs = 2; % min number of channels
 max_ch_pct = 50; % if spike > 50% of channels, throw away
 min_time = 50/1000;
 
