@@ -220,12 +220,14 @@ for p = whichPts
             %% Spike detection
             if doing_test && ~isempty(test_label)
                 test_ch = strcmp(test_label,chLabels);
-                gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
-                %out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,test_ch);
+                %gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
+                out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,test_ch);
             else
-                gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
-                %out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,[]);
+                %gdf = fspk2(values,tmul,absthresh,size(values,2),fs);
+                out = detect_spikes(values,tmul,absthresh,fs,min_chs,max_ch_pct,[]);
             end
+            
+            %{
             max_chs = round(max_ch_pct/100*size(values,2));
             min_idx = min_time*fs;
             
@@ -240,6 +242,7 @@ for p = whichPts
             else
                 out = gdf;
             end
+            %}
 
             if ~isempty(out)
 

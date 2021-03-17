@@ -22,7 +22,7 @@ lfr    = 7;  % low pass filter for slow wave component
 aftdur = 150;
 aftdur   = aftdur*rate/1000;   % convert to points;
 spikedur = 20; % minimum spike duration in points
-fn_fr  = 1; % high pass filter for spikey component
+fn_fr  = 7; % high pass filter for spikey component
 
 % Initialize things
 all_spikes  = [];
