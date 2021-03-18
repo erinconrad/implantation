@@ -1,6 +1,6 @@
 
 
-function get_chosen_spikes(whichPts,tmul,min_chs,overwrite)
+function get_chosen_spikes(whichPts,tmul,absthresh,min_chs,overwrite)
 
 %running through 9
 
@@ -25,7 +25,6 @@ else
 end
 
 %% Spike detector parameters
-absthresh = 300;
 max_ch_pct = 50; % if spike > 50% of channels, throw away
 
 display_time = 60;
