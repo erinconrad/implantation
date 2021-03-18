@@ -1,6 +1,6 @@
 
 
-function tune_detectors(p,start_time,tmul,min_chs)
+function tune_detectors(p,start_time,tmul,absthresh,min_chs)
 
 %% General parameters
 do_plot = 1;
@@ -11,7 +11,6 @@ max_ch_pct = 50; % if spike > 50% of channels, throw away
 
 allowable_time_from_zero = 0.1; % 100 ms
 rm_bad = 1;
-absthresh = 300;
 
 
 %% Locations

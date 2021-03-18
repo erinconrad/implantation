@@ -89,6 +89,7 @@ for dd = chs_to_do
         % now have a list of sharp waves that have passed criterion
 
         % check for after hyperpolarization
+        if 1
         dellist = [];
 
 
@@ -129,6 +130,7 @@ for dd = chs_to_do
         s = spikes;
 
         spikes(dellist,:) = [];
+        end
 
         tooshort = [];
         toosmall = [];
@@ -206,7 +208,7 @@ end
 % sort by time
 all_spikes = sortrows(all_spikes);
 min_time = 100*rate/1000;
-max_chs = round(max_ch_pct*n_chans);
+max_chs = round(max_ch_pct/100*n_chans);
 
 final_spikes = min_max_length(all_spikes,min_time,min_chs,max_chs);
   
