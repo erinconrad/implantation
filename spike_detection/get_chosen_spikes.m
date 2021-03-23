@@ -1,6 +1,6 @@
 
 
-function get_chosen_spikes(whichPts,tmul,absthresh,min_chs,overwrite)
+function get_chosen_spikes(whichPts,tmul,absthresh,overwrite)
 
 %running through 9
 
@@ -8,6 +8,7 @@ function get_chosen_spikes(whichPts,tmul,absthresh,min_chs,overwrite)
 doing_test = 0;
 %whichPts = [10 1 3 5 6 8 9 11]; % I believe these are the pts with all available data
 add_clean_times = 0;
+min_chs = 2;
 batch_time = 60;
 pt_file = 'pt_w_elecs.mat';
 

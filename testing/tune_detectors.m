@@ -30,7 +30,12 @@ pt = pt.pt;
 
 pt_name = pt(p).name;
 % Always first file
-ieeg_name = pt(p).ieeg_names{1};
+if p == 3
+    f = 2;
+else
+    f = 1;
+end
+ieeg_name = pt(p).ieeg_names{f};
 
 
 %% Start getting data
@@ -73,7 +78,7 @@ while 1
         out = adjust_spike_times(out,start_time,fs);
 
         %% Re-derive original channels
-        out = rederive_original_chs(chIndices,out,chLabels,orig_labels);
+        out = rederive_original_chs(chIndices,out,chLabels,new_orig_labels);
     else
         indices = [];
     end
