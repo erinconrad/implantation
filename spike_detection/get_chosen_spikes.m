@@ -14,10 +14,10 @@ pt_file = 'pt_w_elecs.mat';
 
 %% Test parameters
 if doing_test
-    test_pt = 'HUP78_phaseII';
+    test_pt = 'HUP152_phaseII_D01';
     do_plots = 1;
-    test_time = 402536.90;
-    test_label = [];%'LG59';%[];%'AST1';
+    test_time = 568988.61;
+    test_label = 'LB6';%'LG59';%[];%'AST1';
     do_save = 0;
     overwrite = 1;
 else

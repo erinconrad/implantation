@@ -27,7 +27,7 @@ n_std = 2;
 top_perc = 5;
 nboot = 1e4;
 pt_file = 'pt_w_elecs.mat';
-do_rel = 1;
+do_rel = 0;
 do_boot = 1;
 perc_closest_elecs = 0.05;
 early_post_implant = 51:60;
@@ -113,7 +113,7 @@ post = sum(all_counts(:,num_pre+1:end),2);
 if do_rel == 1
     rel_change = (post-pre)./pre;
 else
-    rel_change = post;
+    rel_change = post-pre;
 end
 
 %% Get distances from closest new electrodes
